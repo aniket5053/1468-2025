@@ -105,11 +105,21 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(false, 10);
 
     // Correct pose estimate with vision measurements
-    var visionEst = robotContainer.s_Vision.getEstimatedGlobalPose();
-    visionEst.ifPresent(
+    var visionTagEst = robotContainer.s_Vision.getEstimatedTagGlobalPose();
+    visionTagEst.ifPresent(
         est -> {
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = robotContainer.s_Vision.getEstimationStdDevs();
+          var estStdDevs = robotContainer.s_Vision.getEstimationTagStdDevs();
+
+          robotContainer.drive.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
+
+    var visionNoteEst = robotContainer.s_Vision.getEstimatedNoteGlobalPose();
+    visionNoteEst.ifPresent(
+        est -> {
+          // Change our trust in the measurement based on the tags we can see
+          var estStdDevs = robotContainer.s_Vision.getEstimationNoteStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);

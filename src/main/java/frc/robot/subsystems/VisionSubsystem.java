@@ -78,10 +78,13 @@ public class VisionSubsystem extends SubsystemBase {
 
   private boolean aprilTag7Detected = false;
   private double aprilTag7Yaw = 0;
-  private Matrix<N3, N1> curStdDevs;
+  private Matrix<N3, N1> curAprilStdDevs;
+  private Matrix<N3, N1> curNoteStdDevs;
+
   public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
   // public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-  public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.025, 0.025, .1);
+  public static final Matrix<N3, N1> kMultiTagNoteStdDevs = VecBuilder.fill(0.025, 0.025, .1);
+  public static final Matrix<N3, N1> kMultiTagAprilStdDevs = VecBuilder.fill(0.1, 0.1, .4);
 
   public VisionSubsystem() {
     // Additional initialization if needed
@@ -191,11 +194,11 @@ public class VisionSubsystem extends SubsystemBase {
     return aprilTagTargetY;
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+  public Optional<EstimatedRobotPose> getEstimatedTagGlobalPose() {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
     for (var change : aprilTagCamera.getAllUnreadResults()) {
       visionEst = AprilTagPoseEstimator.update(change);
-      updateEstimationStdDevs(visionEst, change.getTargets());
+      updateEstimationTagStdDevs(visionEst, change.getTargets());
     }
     return visionEst;
   }
@@ -207,11 +210,11 @@ public class VisionSubsystem extends SubsystemBase {
    * @param estimatedPose The estimated pose to guess standard deviations for.
    * @param targets All targets in this camera frame
    */
-  private void updateEstimationStdDevs(
+  private void updateEstimationTagStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
-      curStdDevs = kSingleTagStdDevs;
+      curAprilStdDevs = kSingleTagStdDevs;
 
     } else {
       // Pose present. Start running Heuristic
@@ -234,17 +237,17 @@ public class VisionSubsystem extends SubsystemBase {
 
       if (numTags == 0) {
         // No tags visible. Default to single-tag std devs
-        curStdDevs = kSingleTagStdDevs;
+        curAprilStdDevs = kSingleTagStdDevs;
       } else {
         // One or more tags visible, run the full heuristic.
         avgDist /= numTags;
         // Decrease std devs if multiple targets are visible
-        if (numTags > 1) estStdDevs = kMultiTagStdDevs;
+        if (numTags > 1) estStdDevs = kMultiTagAprilStdDevs;
         // Increase std devs based on (average) distance
         if (numTags == 1 && avgDist > 4)
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        curStdDevs = estStdDevs;
+        curAprilStdDevs = estStdDevs;
       }
     }
   }
@@ -255,7 +258,69 @@ public class VisionSubsystem extends SubsystemBase {
    * edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}. This should
    * only be used when there are targets visible.
    */
-  public Matrix<N3, N1> getEstimationStdDevs() {
-    return curStdDevs;
+  public Matrix<N3, N1> getEstimationTagStdDevs() {
+    return curAprilStdDevs;
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedNoteGlobalPose() {
+    Optional<EstimatedRobotPose> visionEst = Optional.empty();
+    for (var change : noteTagCamera.getAllUnreadResults()) {
+      visionEst = notePoseEstimator.update(change);
+      updateEstimationNoteStdDevs(visionEst, change.getTargets());
+    }
+    return visionEst;
+  }
+
+  /**
+   * Calculates new standard deviations This algorithm is a heuristic that creates dynamic standard
+   * deviations based on number of tags, estimation strategy, and distance from the tags.
+   *
+   * @param estimatedPose The estimated pose to guess standard deviations for.
+   * @param targets All targets in this camera frame
+   */
+  private void updateEstimationNoteStdDevs(
+      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+    if (estimatedPose.isEmpty()) {
+      // No pose input. Default to single-tag std devs
+      curNoteStdDevs = kSingleTagStdDevs;
+
+    } else {
+      // Pose present. Start running Heuristic
+      var estStdDevs = kSingleTagStdDevs;
+      int numTags = 0;
+      double avgDist = 0;
+
+      // Precalculation - see how many tags we found, and calculate an average-distance metric
+      for (var tgt : targets) {
+        var tagPose = AprilTagPoseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) continue;
+        numTags++;
+        avgDist +=
+            tagPose
+                .get()
+                .toPose2d()
+                .getTranslation()
+                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
+
+      if (numTags == 0) {
+        // No tags visible. Default to single-tag std devs
+        curNoteStdDevs = kSingleTagStdDevs;
+      } else {
+        // One or more tags visible, run the full heuristic.
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) estStdDevs = kMultiTagNoteStdDevs;
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4)
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        curNoteStdDevs = estStdDevs;
+      }
+    }
+  }
+
+  public Matrix<N3, N1> getEstimationNoteStdDevs() {
+    return curNoteStdDevs;
   }
 }
