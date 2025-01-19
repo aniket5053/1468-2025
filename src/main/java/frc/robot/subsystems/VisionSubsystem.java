@@ -2,12 +2,18 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
+import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -16,10 +22,10 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class VisionSubsystem extends SubsystemBase {
   // Create PhotonCamera objects
   private final PhotonCamera aprilTagCamera = new PhotonCamera("AprilTagCamera");
-  private final PhotonCamera noteCamera = new PhotonCamera("NoteCamera");
+  private final PhotonCamera noteTagCamera = new PhotonCamera("NoteCamera");
 
   // Construct PhotonPoseEstimator
-  private final Transform3d robotToAprilTagCamera =
+  private final Transform3d robotToNoteCamera =
       new Transform3d(
           new Translation3d(0.2176272, 0.0882396, 0.2332736),
           new Rotation3d(
@@ -31,6 +37,11 @@ public class VisionSubsystem extends SubsystemBase {
   // private final Transform3d robotToAprilTagCamera = new Transform3d(new Translation3d(0.5, 0.0,
   // 0.5), new Rotation3d(0,0,0));     // EXAMPLE: Cam mounted facing forward, half a meter forward
   // of center, half a meter up from center
+
+  private final Transform3d robotToAprilTagCamera =
+      new Transform3d(
+          new Translation3d(0.2176272, -0.0882396, 0.34671),
+          new Rotation3d(0, -0.294524311, -0.078644536));
   private final PoseStrategy poseStrategy =
       PoseStrategy
           .MULTI_TAG_PNP_ON_COPROCESSOR; // TODO: Ensure that your camera is calibrated and 3D mode
@@ -41,8 +52,11 @@ public class VisionSubsystem extends SubsystemBase {
           .loadAprilTagLayoutField(); // TODO: // The field from AprilTagFields will be different
   // depending on the game.
 
-  PhotonPoseEstimator photonPoseEstimator =
+  PhotonPoseEstimator AprilTagPoseEstimator =
       new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToAprilTagCamera);
+
+  PhotonPoseEstimator notePoseEstimator =
+      new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToNoteCamera);
 
   // Initialize variables (default if aprilTagResults is empty)
   private boolean aprilTagHasTargets = false;
@@ -53,6 +67,8 @@ public class VisionSubsystem extends SubsystemBase {
   private double aprilTagTargetYaw = 0;
   private double aprilTagTargetPitch = 0;
   private double aprilTagTargetArea = 0;
+  private double aprilTagTargetX = 0;
+  private double aprilTagTargetY = 0;
 
   private boolean noteHasTargets = false;
   private boolean multipleNotes = false;
@@ -62,6 +78,10 @@ public class VisionSubsystem extends SubsystemBase {
 
   private boolean aprilTag7Detected = false;
   private double aprilTag7Yaw = 0;
+  private Matrix<N3, N1> curStdDevs;
+  public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+  // public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+  public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.025, 0.025, .1);
 
   public VisionSubsystem() {
     // Additional initialization if needed
@@ -90,6 +110,9 @@ public class VisionSubsystem extends SubsystemBase {
             aprilTag7Yaw = target.getYaw();
           }
         }
+
+        aprilTagTargetX = aprilTagResult.getBestTarget().getBestCameraToTarget().getX();
+        aprilTagTargetY = aprilTagResult.getBestTarget().getBestCameraToTarget().getY();
 
         // Get a list of currently tracked targets.
         List<PhotonTrackedTarget> aprilTagTargets = aprilTagResult.getTargets();
@@ -130,46 +153,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Note Camera
 
-    // Read in relevant data from the Camera
-    var noteResults = noteCamera.getAllUnreadResults();
-    if (!noteResults.isEmpty()) {
-      // Camera processed a new frame since last
-      // Get the last one in the list.
-      var noteResult = noteResults.get(noteResults.size() - 1);
-
-      if (noteResult.hasTargets()) {
-        // At least one note was seen by the camera
-        noteHasTargets = true;
-
-        // Get a list of currently tracked targets.
-        List<PhotonTrackedTarget> noteTargets = noteResult.getTargets();
-        if (noteTargets.size() > 1) {
-          // Multiple notes detected
-          multipleNotes = true;
-        } else {
-          // Only one note detected
-          multipleNotes = false;
-        }
-
-        // Gets best target (for multiple targets)
-        noteTargetYaw = noteResult.getBestTarget().getYaw();
-        noteTargetPitch = noteResult.getBestTarget().getPitch();
-        noteTargetArea = noteResult.getBestTarget().getArea();
-      } else {
-        // No notes detected by camera
-        noteHasTargets = false;
-        multipleNotes = false;
-        noteTargetYaw = 0;
-        noteTargetPitch = 0;
-        noteTargetArea = 0;
-      }
-    }
-    // Publish to SmartDashboard
-    SmartDashboard.putBoolean("Note Dectected?", noteHasTargets);
-    SmartDashboard.putBoolean("Multiple Notes?", multipleNotes);
-    SmartDashboard.putNumber("Note Yaw", noteTargetYaw);
-    SmartDashboard.putNumber("Note Pitch", noteTargetPitch);
-    SmartDashboard.putNumber("Note Area", noteTargetArea);
   }
 
   // Getter methods to access target data
@@ -198,5 +181,81 @@ public class VisionSubsystem extends SubsystemBase {
 
   public double getNoteTargetArea() {
     return noteTargetArea;
+  }
+
+  public double getTargetX() {
+    return aprilTagTargetX;
+  }
+
+  public double getTargetY() {
+    return aprilTagTargetY;
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+    Optional<EstimatedRobotPose> visionEst = Optional.empty();
+    for (var change : aprilTagCamera.getAllUnreadResults()) {
+      visionEst = AprilTagPoseEstimator.update(change);
+      updateEstimationStdDevs(visionEst, change.getTargets());
+    }
+    return visionEst;
+  }
+
+  /**
+   * Calculates new standard deviations This algorithm is a heuristic that creates dynamic standard
+   * deviations based on number of tags, estimation strategy, and distance from the tags.
+   *
+   * @param estimatedPose The estimated pose to guess standard deviations for.
+   * @param targets All targets in this camera frame
+   */
+  private void updateEstimationStdDevs(
+      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+    if (estimatedPose.isEmpty()) {
+      // No pose input. Default to single-tag std devs
+      curStdDevs = kSingleTagStdDevs;
+
+    } else {
+      // Pose present. Start running Heuristic
+      var estStdDevs = kSingleTagStdDevs;
+      int numTags = 0;
+      double avgDist = 0;
+
+      // Precalculation - see how many tags we found, and calculate an average-distance metric
+      for (var tgt : targets) {
+        var tagPose = AprilTagPoseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) continue;
+        numTags++;
+        avgDist +=
+            tagPose
+                .get()
+                .toPose2d()
+                .getTranslation()
+                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
+
+      if (numTags == 0) {
+        // No tags visible. Default to single-tag std devs
+        curStdDevs = kSingleTagStdDevs;
+      } else {
+        // One or more tags visible, run the full heuristic.
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) estStdDevs = kMultiTagStdDevs;
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4)
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        curStdDevs = estStdDevs;
+      }
+    }
+  }
+
+  /**
+   * Returns the latest standard deviations of the estimated pose from {@link
+   * #getEstimatedGlobalPose()}, for use with {@link
+   * edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}. This should
+   * only be used when there are targets visible.
+   */
+  public Matrix<N3, N1> getEstimationStdDevs() {
+    return curStdDevs;
   }
 }

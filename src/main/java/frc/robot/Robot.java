@@ -103,6 +103,17 @@ public class Robot extends LoggedRobot {
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
+
+    // Correct pose estimate with vision measurements
+    var visionEst = robotContainer.s_Vision.getEstimatedGlobalPose();
+    visionEst.ifPresent(
+        est -> {
+          // Change our trust in the measurement based on the tags we can see
+          var estStdDevs = robotContainer.s_Vision.getEstimationStdDevs();
+
+          robotContainer.drive.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
   }
 
   /** This function is called once when the robot is disabled. */
