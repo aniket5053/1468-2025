@@ -21,6 +21,42 @@ import edu.wpi.first.wpilibj.RobotBase;
  * (log replay from a file).
  */
 public final class Constants {
+
+  // CANdle constants
+  /*
+   * This example uses:
+   * - A CANdle wired on the CAN Bus, with a 5m led strip attached for the extra animatinos.
+   *
+   * Controls (with Xbox controller):
+   * Right Bumper: Increment animation
+   * Left Bumper: Decrement animation
+   * Start Button: Switch to setting the first 8 LEDs a unique combination of colors
+   * POV Right: Configure maximum brightness for the CANdle
+   * POV Down: Configure medium brightness for the CANdle
+   * POV Left: Configure brightness to 0 for the CANdle
+   * POV Up: Change the direction of Rainbow and Fire, must re-select the animation to take affect
+   * A: Print the VBat voltage in Volts
+   * B: Print the 5V voltage in Volts
+   * X: Print the current in amps
+   * Y: Print the temperature in degrees C
+   */
+
+  public static final int CANdleID = 1;
+  public static final int JoystickId = 0;
+  // public static final int IncrementAnimButton = XboxController.Button.kRightBumper.value;
+  // public static final int DecrementAnimButton = XboxController.Button.kLeftBumper.value;
+  // public static final int BlockButton = XboxController.Button.kStart.value;
+  public static final int MaxBrightnessAngle = 90;
+  public static final int MidBrightnessAngle = 180;
+  public static final int ZeroBrightnessAngle = 270;
+  public static final int ChangeDirectionAngle = 0;
+  // public static final int VbatButton = XboxController.Button.kA.value;
+  // public static final int V5Button = XboxController.Button.kB.value;
+  // public static final int CurrentButton = XboxController.Button.kX.value;
+  // public static final int TemperatureButton = XboxController.Button.kY.value;
+
+  // AdvantageKit Constants
+
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 

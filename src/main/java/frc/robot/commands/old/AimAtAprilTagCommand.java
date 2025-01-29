@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.old;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,26 +35,31 @@ public class AimAtAprilTagCommand extends Command {
     double xSpeed = -driverLeftJoystick.getY();
     double ySpeed = -driverLeftJoystick.getX();
 
-    if (m_vision.specificAprilTagDetected(aprilTagId)) {
-      if ((Math.abs(m_vision.getSpecificAprilTagYaw(aprilTagId)) - Math.abs(targetYaw))
-          > yawTolerance) {
-        if (m_vision.getSpecificAprilTagYaw(aprilTagId) < targetYaw) {
-          // Rotate CCW
-          SmartDashboard.putString("AimAtAprilTag Status", "CCW");
-          m_drive.driveWithSpeeds(xSpeed, ySpeed, rotationSpeed, true);
+    /*
+
+        if (m_vision.specificAprilTagDetected(aprilTagId)) {
+          if ((Math.abs(m_vision.getSpecificAprilTagYaw(aprilTagId)) - Math.abs(targetYaw))
+              > yawTolerance) {
+            if (m_vision.getSpecificAprilTagYaw(aprilTagId) < targetYaw) {
+              // Rotate CCW
+              SmartDashboard.putString("AimAtAprilTag Status", "CCW");
+              m_drive.driveWithSpeeds(xSpeed, ySpeed, rotationSpeed, true);
+            } else {
+              // Rotate CW
+              SmartDashboard.putString("AimAtAprilTag Status", "CW");
+              m_drive.driveWithSpeeds(xSpeed, ySpeed, -rotationSpeed, true);
+            }
+          } else {
+            SmartDashboard.putString("AimAtAprilTag Status", "No rotation");
+            m_drive.driveWithSpeeds(xSpeed, ySpeed, 0, true);
+          }
         } else {
-          // Rotate CW
-          SmartDashboard.putString("AimAtAprilTag Status", "CW");
-          m_drive.driveWithSpeeds(xSpeed, ySpeed, -rotationSpeed, true);
+          SmartDashboard.putString("AimAtAprilTag Status", "APRILTAG 7 NOT SEEN");
+          m_drive.driveWithSpeeds(xSpeed, ySpeed, 0, true);
         }
-      } else {
-        SmartDashboard.putString("AimAtAprilTag Status", "No rotation");
-        m_drive.driveWithSpeeds(xSpeed, ySpeed, 0, true);
-      }
-    } else {
-      SmartDashboard.putString("AimAtAprilTag Status", "APRILTAG 7 NOT SEEN");
-      m_drive.driveWithSpeeds(xSpeed, ySpeed, 0, true);
-    }
+
+    */
+
   }
 
   // Called once the command ends or is interrupted.

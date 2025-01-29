@@ -15,6 +15,7 @@ package frc.robot;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -105,25 +106,29 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(false, 10);
 
     // Correct pose estimate with vision measurements
-    var visionTagEst = robotContainer.s_Vision.getEstimatedTagGlobalPose();
-    visionTagEst.ifPresent(
+    var frntCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingFrntCamTgts();
+    frntCamPoseEst.ifPresent(
         est -> {
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = robotContainer.s_Vision.getEstimationTagStdDevs();
+          var estStdDevs = robotContainer.s_Vision.getEstimationFrntCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
-    var visionNoteEst = robotContainer.s_Vision.getEstimatedNoteGlobalPose();
-    visionNoteEst.ifPresent(
+    var rearCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingRearCamTgts();
+    rearCamPoseEst.ifPresent(
         est -> {
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = robotContainer.s_Vision.getEstimationNoteStdDevs();
+          var estStdDevs = robotContainer.s_Vision.getEstimationRearCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
+
+    SmartDashboard.putNumber("Robot X", robotContainer.drive.getPose().getX());
+    SmartDashboard.putNumber("Robot Y", robotContainer.drive.getPose().getY());
+    SmartDashboard.putNumber("Robot Yaw", robotContainer.drive.getRotation().getDegrees());
   }
 
   /** This function is called once when the robot is disabled. */

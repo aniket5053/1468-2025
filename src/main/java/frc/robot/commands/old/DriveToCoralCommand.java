@@ -1,27 +1,24 @@
-package frc.robot.commands;
+package frc.robot.commands.old;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.Drive;
 
-public class DriveToAprilTagCommand extends Command {
-  private final double targetYaw = -5.5; // Desired yaw value to align to
-  private final double yawTolerance = 5.0; // degrees
-  private final double strafeTolerance = 2.0;
-  private final double xDriveSpeed = 0.25; // percentage
-  private final double yDriveSpeed = 0.20;
-  private final double rotationSpeed = 0.25; // percentage
+public class DriveToCoralCommand extends Command {
+  private double offset = 0.0; // Desired yaw value to align to
+
   private boolean isAligned = false; // Tracks whether alignment is achieved
 
   private final Drive m_drive;
   private final VisionSubsystem m_vision;
 
-  public DriveToAprilTagCommand(Drive drive, VisionSubsystem vision) {
+  public DriveToCoralCommand(Drive drive, VisionSubsystem vision, double offset) {
     m_drive = drive;
     addRequirements(m_drive);
     m_vision = vision;
     addRequirements(m_vision);
+    this.offset = offset;
   }
 
   // Called when the command is initially scheduled.
@@ -30,27 +27,29 @@ public class DriveToAprilTagCommand extends Command {
 
   @Override
   public void execute() {
-    if (m_vision.specificAprilTagDetected(7)) {
+    if (m_vision.rearCamTgtDectected()) {
 
-      double Tx = m_vision.getTargetX();
-      double Ty = m_vision.getTargetY();
+      double Tx = m_vision.getRearCamBestTgtX();
+      double Ty = m_vision.getRearCamBestTgtY();
       double Tyaw = m_drive.getRotation().getDegrees();
-      SmartDashboard.putNumber("DriveToTag Tx", Tx);
-      SmartDashboard.putNumber("DriveToTag Ty", Ty);
-      SmartDashboard.putNumber("DriveToTag Tyaw", Tyaw);
+      //      SmartDashboard.putNumber("DriveToTag Tx", Tx);
+      //      SmartDashboard.putNumber("DriveToTag Ty", Ty);
+      //      SmartDashboard.putNumber("DriveToTag Tyaw", Tyaw);
 
-      Tx = (Tx - 2) * 2.0;
+      // NOTE - Camera is facing backards, so all driving must be reversed (Mult by -1)
+      Tx = (Tx - 0.3) * 2.0;
       if (Tx > 0.5) Tx = 0.5;
       if (Tx < -0.5) Tx = -0.5;
-      Ty = (Ty - .00) * 2.0;
-      if (Ty > 0.5) Ty = 0.5;
-      if (Ty < -0.5) Ty = -0.5;
-      Tyaw = (Tyaw - 4.5) * (-.05);
-      if (Tyaw > 0.25) Tyaw = 0.25;
-      if (Tyaw < -0.25) Tyaw = -0.25;
+      Ty = (Ty - this.offset / 39.3701) * 2.0;
+      if (Ty > 0.375) Ty = 0.375; // .5 too much
+      if (Ty < -0.375) Ty = -0.375;
+      Tyaw = (Tyaw - 0.2) * (.1); // 0.05 too small     :was negative
+      if (Tyaw > 0.375) Tyaw = 0.375; // 0.25 too small
+      if (Tyaw < -0.375) Tyaw = -0.375;
 
-      m_drive.driveWithSpeeds(Tx, Ty, Tyaw, false);
+      m_drive.driveWithSpeeds(Tx, Ty, 0, false);
     } else {
+      m_drive.driveWithSpeeds(0, 0, 0, false);
       SmartDashboard.putString("DriveToTag Status", "NOTE NOT SEEN");
     }
   }
