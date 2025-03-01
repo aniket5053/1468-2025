@@ -27,10 +27,10 @@ public class DriveToCoralCommand extends Command {
 
   @Override
   public void execute() {
-    if (m_vision.rearCamTgtDectected()) {
+    if (m_vision.leftFrtCamTgtDectected()) {
 
-      double Tx = m_vision.getRearCamBestTgtX();
-      double Ty = m_vision.getRearCamBestTgtY();
+      double Tx = m_vision.getleftFrtCamBestTgtX();
+      double Ty = m_vision.getleftFrtCamBestTgtY();
       double Tyaw = m_drive.getRotation().getDegrees();
       //      SmartDashboard.putNumber("DriveToTag Tx", Tx);
       //      SmartDashboard.putNumber("DriveToTag Ty", Ty);

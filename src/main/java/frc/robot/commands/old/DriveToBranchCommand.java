@@ -27,11 +27,11 @@ public class DriveToBranchCommand extends Command {
 
   @Override
   public void execute() {
-    if (m_vision.frntCamTgtDectected()) {
+    if (m_vision.rightFrtCamTgtDectected()) {
 
-      double Tx = m_vision.getFrntCamBestTgtX();
-      double Ty = m_vision.getFrntCamBestTgtY();
-      double Tyaw = m_vision.getFrntCamBestTgtYaw();
+      double Tx = m_vision.getrightFrtCamBestTgtX();
+      double Ty = m_vision.getrightFrtCamBestTgtY();
+      double Tyaw = m_vision.getrightFrtCamBestTgtYaw();
       //      double robotYaw = m_drive.getRotation().getDegrees();
 
       Tx = (Tx - 0.3) * 2.0; // drive to ~12 inches of april tag - X direction

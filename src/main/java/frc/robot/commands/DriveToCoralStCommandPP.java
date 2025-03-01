@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.ConstantsMechanisms.DriveConstants.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -8,11 +10,8 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.ConstantsForHHS_Code;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import java.util.List;
@@ -39,56 +38,75 @@ public class DriveToCoralStCommandPP extends Command {
 
   @Override
   public void execute() {
+    //      Rear Camera Code - removed, now have 2 front cameras
     // Activate a path only if its a valid Reef April Tag ID detected
-    if (m_vision.rearCamTgtDectected()
-        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
-        (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Red)
-                && (m_vision.getRearCamBestTgtId() >= 1)
-                && (m_vision.getRearCamBestTgtId() <= 2))
-            || (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Blue)
-                && (m_vision.getRearCamBestTgtId() >= 12)
-                && (m_vision.getRearCamBestTgtId() <= 13)))) {
+    //    if (m_vision.rearCamTgtDectected()
+    //        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
+    //        (DriverStation.getAlliance().isPresent()
+    //                && (DriverStation.getAlliance().get() == Alliance.Red)
+    //                && (m_vision.getRearCamBestTgtId() >= 1)
+    //                && (m_vision.getRearCamBestTgtId() <= 2))
+    //            || (DriverStation.getAlliance().isPresent()
+    //                && (DriverStation.getAlliance().get() == Alliance.Blue)
+    //                && (m_vision.getRearCamBestTgtId() >= 12)
+    //                && (m_vision.getRearCamBestTgtId() <= 13)))) {
+    //      Rear Camera Code - removed, now have 2 front cameras
 
-      // The rotation component in these poses represents the direction of travel
-      double TempX = m_drive.getPose().getX();
-      double TempY = m_drive.getPose().getY();
-      Rotation2d TempAngle = Rotation2d.fromDegrees(180.0 + endPtHoloRotation);
-      //      Pose2d startPt = m_drive.getPose();
-      Pose2d startPt = new Pose2d(TempX, TempY, TempAngle);
-
-      double TgtID = m_vision.getRearCamBestTgtId();
-      DetermineEndPoint(TgtID, offset);
-      // since driving backwards, the direction of travel is 180 + rotation
-      Pose2d endPt =
-          new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(180.0 + endPtHoloRotation)); // x,-y
-
-      List<Waypoint> wayPoints = PathPlannerPath.waypointsFromPoses(startPt, endPt);
-      PathPlannerPath path =
-          new PathPlannerPath(
-              wayPoints,
-              new PathConstraints(
-                  //              4.0, 4.0,
-                  3.0, 3.0, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-              null,
-              //  new
-              // IdealStartingState(m_drive.getFFCharacterizationVelocity()*TunerConstants.kDriveGearRatio, m_drive.getRotation()),
-              new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
-
-      // Prevent this path from being flipped on the red alliance, since the given
-      // positions are already correct
-      path.preventFlipping = true;
-
-      AutoBuilder.followPath(path).schedule();
-
-      //////// Have to get initial yaw value from robot and calculate a delta yaw offf
-      //////// the apriltag yaw
-
-    } else {
-      m_drive.stop();
-      SmartDashboard.putString("DriveToTag Status", "NOTE NOT SEEN");
+    // The rotation component in these poses represents the direction of travel
+    double TempX = m_drive.getPose().getX();
+    double TempY = m_drive.getPose().getY();
+    Rotation2d TempAngle = Rotation2d.fromDegrees(180.0 + endPtHoloRotation);
+    //      Pose2d startPt = m_drive.getPose();
+    Pose2d startPt = new Pose2d(TempX, TempY, TempAngle);
+    double TgtID = 0.0;
+    if (TempX < 8.0) { // Blue Side
+      if (TempY < 4.0) {
+        TgtID = 12.0;
+      } else {
+        TgtID = 13.0;
+      }
+    } else { // Red Side
+      if (TempY < 4.0) {
+        TgtID = 1.0;
+      } else {
+        TgtID = 2.0;
+      }
     }
+
+    //      double TgtID = m_vision.getRearCamBestTgtId();
+
+    DetermineEndPoint(TgtID, offset);
+    // since driving backwards, the direction of travel is 180 + rotation
+    Pose2d endPt =
+        new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(180.0 + endPtHoloRotation)); // x,-y
+
+    List<Waypoint> wayPoints = PathPlannerPath.waypointsFromPoses(startPt, endPt);
+    PathPlannerPath path =
+        new PathPlannerPath(
+            wayPoints,
+            new PathConstraints(
+                3.0,
+                3.0, // was 4
+                // 3.0, 3.0,
+                Units.degreesToRadians(360),
+                Units.degreesToRadians(540)), // was 540
+            null,
+            //  new
+            // IdealStartingState(m_drive.getFFCharacterizationVelocity()*TunerConstants.kDriveGearRatio, m_drive.getRotation()),
+            new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
+
+    // Prevent this path from being flipped on the red alliance, since the given
+    // positions are already correct
+    path.preventFlipping = true;
+
+    AutoBuilder.followPath(path).schedule();
+
+    //      Rear Camera Code - removed, now have 2 front cameras
+    //    } else {
+    //      m_drive.stop();
+    //      SmartDashboard.putString("DriveToTag Status", "NOTE NOT SEEN");
+    //    }
+    //      Rear Camera Code - removed, now have 2 front cameras
   }
   // Called once the command ends or is interrupted.
   @Override
@@ -109,65 +127,65 @@ public class DriveToCoralStCommandPP extends Command {
     switch ((int) Id) {
         // red Coral Stations
       case 1:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
+        if (offset == kLeftSide) {
           endPtX = 16.852;
-          endPtY = 1.364;
+          endPtY = 1.360;
           endPtHoloRotation = 126.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
+        } else if (offset == kRightSide) {
           endPtX = 15.941;
-          endPtY = 0.702;
+          endPtY = 0.700;
           endPtHoloRotation = 126.0;
         } else {
-          endPtX = 16.373;
-          endPtY = 1.108;
+          endPtX = 16.413;
+          endPtY = 1.039;
           endPtHoloRotation = 126.0;
         }
         break;
 
       case 2:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
+        if (offset == kLeftSide) {
           endPtX = 15.941;
-          endPtY = 7.325;
+          endPtY = 7.330;
           endPtHoloRotation = -126.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
+        } else if (offset == kRightSide) {
           endPtX = 16.852;
-          endPtY = 6.647;
+          endPtY = 6.666;
           endPtHoloRotation = -126.0;
         } else {
-          endPtX = 16.373;
+          endPtX = 16.380;
           endPtY = 7.010;
           endPtHoloRotation = -126.0;
         }
         break;
         // blue Coral Station
       case 12:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 1.594;
-          endPtY = 0.712;
+        if (offset == kLeftSide) {
+          endPtX = 1.590;
+          endPtY = 0.710;
           endPtHoloRotation = 54.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 0.713;
+        } else if (offset == kRightSide) {
+          endPtX = 0.700;
           endPtY = 1.358;
           endPtHoloRotation = 54.0;
         } else {
-          endPtX = 1.229;
-          endPtY = 0.983;
+          endPtX = 1.150;
+          endPtY = 1.030;
           endPtHoloRotation = 54.0;
         }
         break;
 
       case 13:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 0.703;
+        if (offset == kLeftSide) {
+          endPtX = 0.690;
           endPtY = 6.660;
           endPtHoloRotation = -54.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 1.661;
+        } else if (offset == kRightSide) {
+          endPtX = 1.645;
           endPtY = 7.356;
           endPtHoloRotation = -54.0;
         } else {
           endPtX = 1.183;
-          endPtY = 7.011;
+          endPtY = 7.020;
           endPtHoloRotation = -54.0;
         }
         break;

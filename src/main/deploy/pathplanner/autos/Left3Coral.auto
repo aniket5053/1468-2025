@@ -7,37 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed1"
+            "pathName": "3CoralRightStep1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed2"
+            "pathName": "3CoralRightStep2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed3"
+            "pathName": "3CoralRightStep3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed4"
+            "pathName": "3CoralRightStep4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed5"
+            "pathName": "3CoralRightStep5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TestRed6"
+            "pathName": "3CoralRightStep6"
           }
         }
       ]

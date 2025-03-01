@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.ConstantsMechanisms.DriveConstants.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -8,27 +10,24 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.ConstantsForHHS_Code;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import java.util.List;
 
-public class DriveToBranchCommandPP extends Command {
+public class DriveToReefCommandPP extends Command {
   private double offset; // Desired yaw value to align to
-  private double robotX, robotY;
-  private double robotYaw, robotYawDegs, turnRads;
-  private boolean isAligned = false; // Tracks whether alignment is achieved
+  //  private double robotX, robotY;
+  //  private double robotYaw, robotYawDegs, turnRads;
+  //  private boolean isAligned = false; // Tracks whether alignment is achieved
   // Note that these 3 vars are determined in the "DetermineEndPoint" routine
   private double endPtX, endPtY, endPtHoloRotation;
 
   private final Drive m_drive;
   private final VisionSubsystem m_vision;
 
-  public DriveToBranchCommandPP(Drive drive, VisionSubsystem vision, double offset) {
+  public DriveToReefCommandPP(Drive drive, VisionSubsystem vision, double offset) {
     m_drive = drive;
     addRequirements(m_drive);
     m_vision = vision;
@@ -42,27 +41,10 @@ public class DriveToBranchCommandPP extends Command {
 
   @Override
   public void execute() {
+
     // Activate a path only if its a valid Reef April Tag ID detected
-    if (m_vision.frntCamTgtDectected()
-        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
-        (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Red)
-                && (m_vision.getFrntCamBestTgtId() >= 6)
-                && (m_vision.getFrntCamBestTgtId() <= 11))
-            || (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Blue)
-                && (m_vision.getFrntCamBestTgtId() >= 17)
-                && (m_vision.getFrntCamBestTgtId() <= 22)))) {
-
-      double TgtID = m_vision.getFrntCamBestTgtId();
-      double Tx = m_vision.getFrntCamBestTgtX();
-      double Ty = m_vision.getFrntCamBestTgtY();
-      double Tyaw = m_vision.getFrntCamBestTgtYaw();
-
-      robotX = m_drive.getPose().getX();
-      robotY = m_drive.getPose().getY();
-      robotYaw = m_drive.getRotation().getRadians();
-      robotYawDegs = m_drive.getRotation().getDegrees();
+    double TgtID = m_vision.getTrgtIdToDriveTo();
+    if (TgtID != 99.0) {
 
       // The rotation component in these poses represents the direction of travel
       double TempX = m_drive.getPose().getX();
@@ -79,8 +61,11 @@ public class DriveToBranchCommandPP extends Command {
           new PathPlannerPath(
               wayPoints,
               new PathConstraints(
-                  //              4.0, 4.0,
-                  3.0, 3.0, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+                  3.0,
+                  3.0, // was 4
+                  // 3.0, 3.0,
+                  Units.degreesToRadians(360),
+                  Units.degreesToRadians(720)), // was 540
               null,
               new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
 
@@ -89,20 +74,20 @@ public class DriveToBranchCommandPP extends Command {
       path.preventFlipping = true;
 
       AutoBuilder.followPath(path).schedule();
-
+      SmartDashboard.putString("DriveToReefCmd", "Driving to AprilTag!");
       //////// Have to get initial yaw value from robot and calculate a delta yaw offf
       //////// the apriltag yaw
 
     } else {
       m_drive.stop();
-      SmartDashboard.putString("DriveToTag Status", "NOTE NOT SEEN");
+      SmartDashboard.putString("DriveToReefCmd", "No April Tag - Stop!");
     }
   }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.putString("DriveToTag Status", "NOT ACTIVE");
-    isAligned = false;
+    SmartDashboard.putString("DriveToReefCmd", "NOT ACTIVE");
+    //    isAligned = false;
     m_drive.stop();
   }
 
@@ -116,47 +101,48 @@ public class DriveToBranchCommandPP extends Command {
   // private double endPtX, endPtY, endPtHoloRotation;
   public void DetermineEndPoint(double Id, double offset) {
     switch ((int) Id) {
-        // red reef
+
+        ////////////////////////////// red reef /////////////////////////////////////////
       case 6:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 13.585;
-          endPtY = 2.790;
+        if (offset == kLeftSide) {
+          endPtX = 13.576;
+          endPtY = 2.805;
           endPtHoloRotation = 120.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 13.874;
-          endPtY = 2.952;
+        } else if (offset == kRightSide) {
+          endPtX = 13.864;
+          endPtY = 2.971;
           endPtHoloRotation = 120.0;
         } else {
-          endPtX = 13.750;
-          endPtY = 2.856;
+          endPtX = 13.742;
+          endPtY = 2.865;
           endPtHoloRotation = 120.0;
         }
         break;
 
       case 7:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 14.385;
+        if (offset == kLeftSide) {
+          endPtX = 14.380;
           endPtY = 3.862;
           endPtHoloRotation = 180.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 14.385;
+        } else if (offset == kRightSide) {
+          endPtX = 14.380;
           endPtY = 4.191;
           endPtHoloRotation = 180.0;
         } else {
           endPtX = 14.400;
-          endPtY = 4.048;
+          endPtY = 4.040;
           endPtHoloRotation = 180.0;
         }
         break;
 
       case 8:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 13.866;
-          endPtY = 5.086;
+        if (offset == kLeftSide) {
+          endPtX = 13.860;
+          endPtY = 5.080;
           endPtHoloRotation = -120.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 13.578;
-          endPtY = 5.250;
+        } else if (offset == kRightSide) {
+          endPtX = 13.577;
+          endPtY = 5.245;
           endPtHoloRotation = -120.0;
         } else {
           endPtX = 13.746;
@@ -166,13 +152,13 @@ public class DriveToBranchCommandPP extends Command {
         break;
 
       case 9:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 12.544;
-          endPtY = 5.252;
+        if (offset == kLeftSide) {
+          endPtX = 12.548;
+          endPtY = 5.245;
           endPtHoloRotation = -60.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
+        } else if (offset == kRightSide) {
           endPtX = 12.263;
-          endPtY = 5.086;
+          endPtY = 5.080;
           endPtHoloRotation = -60.0;
         } else {
           endPtX = 12.379;
@@ -182,29 +168,29 @@ public class DriveToBranchCommandPP extends Command {
         break;
 
       case 10:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 11.740;
+        if (offset == kLeftSide) {
+          endPtX = 11.748;
           endPtY = 4.191;
           endPtHoloRotation = 0.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 11.740;
-          endPtY = 3.862;
+        } else if (offset == kRightSide) {
+          endPtX = 11.748;
+          endPtY = 3.860;
           endPtHoloRotation = 0.0;
         } else {
           endPtX = 11.700;
-          endPtY = 4.048;
+          endPtY = 4.040;
           endPtHoloRotation = 0.0;
         }
         break;
 
       case 11:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 12.263;
-          endPtY = 2.964;
+        if (offset == kLeftSide) {
+          endPtX = 12.264;
+          endPtY = 2.971;
           endPtHoloRotation = 60.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 12.544;
-          endPtY = 2.798;
+        } else if (offset == kRightSide) {
+          endPtX = 12.550;
+          endPtY = 2.805;
           endPtHoloRotation = 60.0;
         } else {
           endPtX = 12.386;
@@ -212,30 +198,31 @@ public class DriveToBranchCommandPP extends Command {
           endPtHoloRotation = 60.0;
         }
         break;
-        // blue reef
+
+        ////////////////////////////// blue reef /////////////////////////////////////////
       case 17:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 3.684;
-          endPtY = 2.962;
+        if (offset == kLeftSide) {
+          endPtX = 3.688;
+          endPtY = 2.970;
           endPtHoloRotation = 60.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 3.971;
-          endPtY = 2.800;
+        } else if (offset == kRightSide) {
+          endPtX = 3.974;
+          endPtY = 2.806;
           endPtHoloRotation = 60.0;
         } else {
-          endPtX = 3.804;
-          endPtY = 2.863;
+          endPtX = 3.810;
+          endPtY = 2.855;
           endPtHoloRotation = 60.0;
         }
         break;
 
       case 18:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 3.170;
-          endPtY = 4.189;
+        if (offset == kLeftSide) {
+          endPtX = 3.172;
+          endPtY = 4.191;
           endPtHoloRotation = 0.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 3.170;
+        } else if (offset == kRightSide) {
+          endPtX = 3.172;
           endPtY = 3.860;
           endPtHoloRotation = 0.0;
         } else {
@@ -246,11 +233,11 @@ public class DriveToBranchCommandPP extends Command {
         break;
 
       case 19:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 3.972;
-          endPtY = 5.249;
+        if (offset == kLeftSide) {
+          endPtX = 3.975;
+          endPtY = 5.244;
           endPtHoloRotation = -60.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
+        } else if (offset == kRightSide) {
           endPtX = 3.687;
           endPtY = 5.082;
           endPtHoloRotation = -60.0;
@@ -262,45 +249,45 @@ public class DriveToBranchCommandPP extends Command {
         break;
 
       case 20:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 5.291;
-          endPtY = 5.084;
+        if (offset == kLeftSide) {
+          endPtX = 5.287;
+          endPtY = 5.078;
           endPtHoloRotation = -120.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 5.004;
-          endPtY = 5.248;
+        } else if (offset == kRightSide) {
+          endPtX = 5.002;
+          endPtY = 5.244;
           endPtHoloRotation = -120.0;
         } else {
-          endPtX = 5.165;
-          endPtY = 5.198;
+          endPtX = 5.162;
+          endPtY = 5.194;
           endPtHoloRotation = -120.0;
         }
         break;
 
       case 21:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 5.805;
+        if (offset == kLeftSide) {
+          endPtX = 5.800;
           endPtY = 3.860;
           endPtHoloRotation = 180.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 5.805;
+        } else if (offset == kRightSide) {
+          endPtX = 5.800;
           endPtY = 4.190;
           endPtHoloRotation = 180.0;
         } else {
-          endPtX = 5.815;
+          endPtX = 5.825;
           endPtY = 4.040;
           endPtHoloRotation = 180.0;
         }
         break;
 
       case 22:
-        if (offset == ConstantsForHHS_Code.LeftSide) {
-          endPtX = 5.005;
-          endPtY = 2.800;
+        if (offset == kLeftSide) {
+          endPtX = 5.000;
+          endPtY = 2.807;
           endPtHoloRotation = 120.0;
-        } else if (offset == ConstantsForHHS_Code.RightSide) {
-          endPtX = 5.288;
-          endPtY = 2.965;
+        } else if (offset == kRightSide) {
+          endPtX = 5.286;
+          endPtY = 2.972;
           endPtHoloRotation = 120.0;
         } else {
           endPtX = 5.165;

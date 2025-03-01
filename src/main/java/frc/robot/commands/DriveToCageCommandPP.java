@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.ConstantsMechanisms.DriveConstants.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -15,15 +17,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import java.util.List;
 
-public class DriveToProcessorCommandPP extends Command {
+public class DriveToCageCommandPP extends Command {
 
   private double endPtX, endPtY, endPtHoloRotation;
-
+  private double offset;
   private final Drive m_drive;
 
-  public DriveToProcessorCommandPP(Drive drive) {
+  public DriveToCageCommandPP(Drive drive, double offset) {
     m_drive = drive;
     addRequirements(m_drive);
+    this.offset = offset;
   }
 
   // Called when the command is initially scheduled.
@@ -39,15 +42,19 @@ public class DriveToProcessorCommandPP extends Command {
     if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Red)) {
       //  Real Coordinates
-      endPtX = 11.561;
-      endPtY = 7.485;
-      endPtHoloRotation = 90.0;
+      endPtX = 9.5;
+      if (offset == kCenter) endPtY = 1.915;
+      if (offset == kLeftSide) endPtY = 0.815;
+      if (offset == kRightSide) endPtY = 3.015;
+      endPtHoloRotation = 180.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Blue)) {
-      endPtX = 5.988;
-      endPtY = 0.572;
-      endPtHoloRotation = -90.0;
+      endPtX = 8.0;
+      if (offset == kCenter) endPtY = 6.138;
+      if (offset == kLeftSide) endPtY = 7.238;
+      if (offset == kRightSide) endPtY = 5.038;
+      endPtHoloRotation = 0.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else {
       endPt = startPt;
@@ -76,7 +83,7 @@ public class DriveToProcessorCommandPP extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.putString("DriveToProcessor status", "NOT ACTIVE");
+    SmartDashboard.putString("DriveToTag Cage", "NOT ACTIVE");
     m_drive.stop();
   }
 

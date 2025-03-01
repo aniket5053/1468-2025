@@ -136,4 +136,15 @@ public class Module {
   public double getFFCharacterizationVelocity() {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
+
+  // TA ADDED - BELOW
+  public void setCoastMode() {
+    io.setDriveCoast();
+    io.setTurnCoast();
+  }
+
+  public void setBrakeMode() {
+    io.setDriveBrake();
+    io.setTurnBrake();
+  }
 }

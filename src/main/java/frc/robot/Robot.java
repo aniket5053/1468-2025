@@ -106,21 +106,21 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(false, 10);
 
     // Correct pose estimate with vision measurements
-    var frntCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingFrntCamTgts();
-    frntCamPoseEst.ifPresent(
+    var rightFrtCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingrightFrtCamTgts();
+    rightFrtCamPoseEst.ifPresent(
         est -> {
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = robotContainer.s_Vision.getEstimationFrntCamStdDevs();
+          var estStdDevs = robotContainer.s_Vision.getEstimationrightFrtCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
-    var rearCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingRearCamTgts();
-    rearCamPoseEst.ifPresent(
+    var leftFrtCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingleftFrtCamTgts();
+    leftFrtCamPoseEst.ifPresent(
         est -> {
           // Change our trust in the measurement based on the tags we can see
-          var estStdDevs = robotContainer.s_Vision.getEstimationRearCamStdDevs();
+          var estStdDevs = robotContainer.s_Vision.getEstimationleftFrtCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
@@ -129,15 +129,25 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("Robot X", robotContainer.drive.getPose().getX());
     SmartDashboard.putNumber("Robot Y", robotContainer.drive.getPose().getY());
     SmartDashboard.putNumber("Robot Yaw", robotContainer.drive.getRotation().getDegrees());
+    SmartDashboard.putNumber("Mod0 in Rotations", robotContainer.drive.getModuleAngle(0) / 360.0);
+    SmartDashboard.putNumber("Mod1 in Rotations", robotContainer.drive.getModuleAngle(1) / 360.0);
+    SmartDashboard.putNumber("Mod2 in Rotations", robotContainer.drive.getModuleAngle(2) / 360.0);
+    SmartDashboard.putNumber("Mod3 in Rotations", robotContainer.drive.getModuleAngle(3) / 360.0);
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // Run the scheduler in disabled mode
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // Run the scheduler in disabled mode
+    CommandScheduler.getInstance().run();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

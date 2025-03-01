@@ -265,4 +265,25 @@ public class ModuleIOTalonFX implements ModuleIO {
               rotation.getRotations());
         });
   }
+
+  // TA ADDED _ BELOW
+  @Override
+  public void setDriveCoast() {
+    driveTalon.setNeutralMode(NeutralModeValue.Coast);
+  }
+
+  @Override
+  public void setTurnCoast() {
+    turnTalon.setNeutralMode(NeutralModeValue.Coast);
+  }
+
+  @Override
+  public void setDriveBrake() {
+    driveTalon.setNeutralMode(NeutralModeValue.Brake);
+  }
+
+  @Override
+  public void setTurnBrake() {
+    turnTalon.setNeutralMode(NeutralModeValue.Brake);
+  }
 }

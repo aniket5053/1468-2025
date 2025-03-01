@@ -49,7 +49,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class CANdleSubsystem extends SubsystemBase {
-  private final int LEDS_PER_ANIMATION = 8; // TA TODO: Update with real LED string length
+  private final int LEDS_PER_ANIMATION = 0; // TA TODO: Update with real LED string length
   private final CANdle m_candle = new CANdle(Constants.CANdleID, "rio");
   private Joystick joystick;
   private int m_candleChannel = 0;

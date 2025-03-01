@@ -44,6 +44,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -136,14 +137,23 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            //            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
-            // 15 too high for translation 20 seems ok, 20 for rotaion is too high
+            // original P is 5.0, this seemed very low with test Bot.
+            //  new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            // 15 too high for translation, 20 for rotaion is too high
+            // 12 & 10 were final Ps for test Bot, but too high for real Bot!!!
+            // new PIDConstants(12.0, 0.0, 0.0), new PIDConstants(10.0, 0.0, 0.0)),
             // TA TODO: Calibrate the Ps with final robot
-            new PIDConstants(12.0, 0.0, 0.0), new PIDConstants(10.0, 0.0, 0.0)),
+            // ta 2/28 - yaw looks good but x,y has an inch +/1 error. trying to fix, P was = 5.0
+            // P=6 may be alittle better than 5 and not jumpy like 7
+            // tried P = 7, robot was "jumpy", p = 3 had larger error (not strong enough)
+            // up to now I and D were zero Tried: 6.5, 0.000005, 0.00000005 - no difference
+            // P = 6.5 seems good, now doing D, .5 too high,
+
+            new PIDConstants(3, 0.200, .1), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
         // TA TODO: Turn off flipping for now!!!
-        // () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-        () -> false,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        // () -> false,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -299,7 +309,9 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the module positions (turn angles and drive positions) for all of the modules. */
-  private SwerveModulePosition[] getModulePositions() {
+  // TA was private
+  //  private SwerveModulePosition[] getModulePositions() {
+  public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
       states[i] = modules[i].getPosition();
@@ -420,5 +432,25 @@ public class Drive extends SubsystemBase {
 
     // Pass the chassis speeds to your swerve drive system
     runVelocity(speeds);
+  }
+
+  // TA ADDED - BELOW
+
+  public double getModuleAngle(int module_id) {
+    return modules[module_id].getAngle().getDegrees();
+  }
+
+  public void setCoast() {
+
+    for (var module : modules) {
+      module.setCoastMode();
+    }
+  }
+
+  public void setBrake() {
+
+    for (var module : modules) {
+      module.setCoastMode();
+    }
   }
 }

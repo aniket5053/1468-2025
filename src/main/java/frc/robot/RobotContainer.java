@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import static frc.robot.ConstantsMechanisms.DriveConstants.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,24 +25,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.CANdleConfigCommands;
-// import frc.robot.ConstantsForHHS_Code.*;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.DriveToBranchCommandPP;
-import frc.robot.commands.DriveToCoralStCommandPP;
-import frc.robot.commands.DriveToProcessorCommandPP;
+import frc.robot.ConstantsMechanisms.ElbowConstants;
+import frc.robot.ConstantsMechanisms.ElevatorConstants;
+import frc.robot.ConstantsMechanisms.WristConstants;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CANdleSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.drive.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -53,12 +48,16 @@ public class RobotContainer {
   // Joysticks used
   final Joystick driverLeftJoystick = new Joystick(0);
   final Joystick driverRightJoystick = new Joystick(1);
-
-  final Joystick operatorJoystick = new Joystick(3);
+  // Operator Left (2) and Right(3)
   final Joystick testOprJoystick = new Joystick(2); // this was for testing purposes only - Tom 2024
+  final Joystick operatorJoystick = new Joystick(3);
 
   // Subsystems
   final Drive drive;
+  final ElbowSubsystem s_Elbow = new ElbowSubsystem();
+  final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
+  final WristSubsystem s_Wrist = new WristSubsystem();
+  final HandlerSubsystem s_Handler = new HandlerSubsystem();
   final VisionSubsystem s_Vision = new VisionSubsystem();
   final CANdleSubsystem m_candleSubsystem = new CANdleSubsystem(operatorJoystick);
 
@@ -68,6 +67,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -103,25 +103,14 @@ public class RobotContainer {
         break;
     }
 
-    // Set up auto routines
-    //   autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up SysId routines
-    //   autoChooser.addOption(
-    //       "Drive Wheel Radius Characterization",
-    // DriveCommands.wheelRadiusCharacterization(drive));
-    //   autoChooser.addOption(
-    //       "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    //   autoChooser.addOption(
-    //       "Drive SysId (Quasistatic Forward)",
-    //       drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    //   autoChooser.addOption(
-    //       "Drive SysId (Quasistatic Reverse)",
-    //       drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    //   autoChooser.addOption(
-    //       "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    //   autoChooser.addOption(
-    //       "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Show what command your subsystem is running on the SmartDashboard
+    SmartDashboard.putData(drive);
+    SmartDashboard.putData(s_Elbow);
+    SmartDashboard.putData(s_Elevator);
+    SmartDashboard.putData(s_Wrist);
+    SmartDashboard.putData(s_Handler);
+    SmartDashboard.putData(s_Vision);
+    SmartDashboard.putData(m_candleSubsystem);
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -142,33 +131,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Driver Buttons
-    //   final JoystickButton driveToNote = new JoystickButton(driverLeftJoystick, 1);
-
-    //    final JoystickButton aimAtAprilTag = new JoystickButton(driverRightJoystick, 1);
-    final JoystickButton drivePPProcessorAprilTag = new JoystickButton(driverLeftJoystick, 2);
-    final JoystickButton drivePPLeftReefAprilTag = new JoystickButton(driverLeftJoystick, 3);
-    final JoystickButton drivePPRightReefAprilTag = new JoystickButton(driverLeftJoystick, 4);
-    final JoystickButton drivePPLeftCoralStAprilTag = new JoystickButton(driverLeftJoystick, 5);
-    final JoystickButton drivePPRightCoralStAprilTag = new JoystickButton(driverLeftJoystick, 6);
-
-    final POVButton lockTo000 = new POVButton(driverLeftJoystick, 0);
-    final POVButton lockTo060 = new POVButton(driverLeftJoystick, 45);
-    final POVButton lockTo090 = new POVButton(driverLeftJoystick, 90);
-    final POVButton lockTo120 = new POVButton(driverLeftJoystick, 135);
-    final POVButton lockTo180 = new POVButton(driverLeftJoystick, 180);
-    final POVButton lockToM120 = new POVButton(driverLeftJoystick, 225);
-    final POVButton lockToM090 = new POVButton(driverLeftJoystick, 270);
-    final POVButton lockToM060 = new POVButton(driverLeftJoystick, 315);
-
-    // old way
-    //  final JoystickButton driveLeftReefAprilTag = new JoystickButton(driverLeftJoystick, 3);
-    //  final JoystickButton driveRightReefAprilTag = new JoystickButton(driverLeftJoystick, 4);
-    //  final JoystickButton driveLeftCoralAprilTag = new JoystickButton(driverLeftJoystick, 5);
-    //  final JoystickButton driveRightCoralAprilTag = new JoystickButton(driverLeftJoystick, 6);
-    final JoystickButton resetGyro = new JoystickButton(driverRightJoystick, 7);
-    final JoystickButton xPattern = new JoystickButton(driverRightJoystick, 8);
-    final JoystickButton stopPath = new JoystickButton(driverRightJoystick, 9);
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -178,129 +140,273 @@ public class RobotContainer {
             () -> -driverLeftJoystick.getX(),
             () -> -driverRightJoystick.getX()));
 
+    // Driver Buttons - Left Joystick  ---------------------------------------------
+
+    new JoystickButton(driverLeftJoystick, 1)
+        .debounce(0.10)
+        .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, kLeftSide));
+    new JoystickButton(driverLeftJoystick, 2)
+        .debounce(0.10)
+        .onTrue(DriveCommands.feedforwardCharacterization(drive));
+    new JoystickButton(driverLeftJoystick, 3)
+        .debounce(0.10)
+        .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
+
+    /*
+               new JoystickButton(driverLeftJoystick, 3)
+                   .debounce(0.10)
+                   .onTrue(new DriveToCageCommandPP(drive, kCenter));
+               new JoystickButton(driverLeftJoystick, 4)
+                   .debounce(0.10)
+                   .onTrue(new DriveToCageCommandPP(drive, kLeftSide));
+               new JoystickButton(driverLeftJoystick, 5)
+                   .debounce(0.10)
+                   .onTrue(new DriveToCageCommandPP(drive, kRightSide));
+
+               new JoystickButton(driverLeftJoystick, 6)
+                   .debounce(0.10)
+                   .onTrue(new DriveToProcessorCommandPP(drive));
+
+           // Lock to 0°
+           new POVButton(driverLeftJoystick, 0)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(0.0)));
+           // Lock to 60°
+           new POVButton(driverLeftJoystick, 45)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(60.0)));
+           // Lock to 90°
+           new POVButton(driverLeftJoystick, 90)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(90.0)));
+           // Lock to 120°
+           new POVButton(driverLeftJoystick, 135)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(120.0)));
+           // Lock to 180°
+           new POVButton(driverLeftJoystick, 180)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(180.0)));
+           // Lock to -120°
+           new POVButton(driverLeftJoystick, 225)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(-120.0)));
+           // Lock to -90°
+           new POVButton(driverLeftJoystick, 270)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(-90.0)));
+           // Lock to -60°
+           new POVButton(driverLeftJoystick, 315)
+               .whileTrue(
+                   DriveCommands.joystickDriveAtAngle(
+                       drive,
+                       () -> -driverLeftJoystick.getY(),
+                       () -> -driverLeftJoystick.getX(),
+                       () -> Rotation2d.fromDegrees(-60.0)));
+
+           // Driver Buttons - Right Joystick --------------------------------------------
+
+           // Switch to X pattern
+           new JoystickButton(driverRightJoystick, 1)
+               .debounce(0.10)
+               .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, kRightSide));
+           // Switch to X pattern
+           new JoystickButton(driverRightJoystick, 2)
+               .debounce(0.10)
+               .onTrue(Commands.runOnce(drive::stopWithX, drive));
+           // Center Lt, Rt Drive to Reef Commands
+    */ new JoystickButton(driverRightJoystick, 3)
+        .debounce(0.10)
+        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kCenter));
+    new JoystickButton(driverRightJoystick, 4)
+        .debounce(0.10)
+        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kLeftSide));
+    new JoystickButton(driverRightJoystick, 5)
+        .debounce(0.10)
+        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kRightSide));
+
     // Reset gyro to 0°
-    resetGyro.onTrue(
-        Commands.runOnce(
-                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                drive)
-            .ignoringDisable(true));
+    new JoystickButton(driverRightJoystick, 7)
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
-    // Switch to X pattern
-    xPattern.onTrue(Commands.runOnce(drive::stopWithX, drive));
     // Stop! - This will stop a "on the fly" pathplanner path
-    stopPath.onTrue(Commands.runOnce(drive::stop, drive));
+    new JoystickButton(driverRightJoystick, 9).onTrue(Commands.runOnce(drive::stop, drive));
 
-    // Lock to 0°
-    lockTo000.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(0.0)));
+    new JoystickButton(driverRightJoystick, 10)
+        .onTrue(new AllMotorsBrake(s_Elbow, s_Elevator, s_Wrist, drive));
+    new JoystickButton(driverRightJoystick, 11)
+        .onTrue(new AllMotorsCoast(s_Elbow, s_Elevator, s_Wrist, drive));
 
-    // Lock to 60°
-    lockTo060.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(58.0)));
-
-    // Lock to 90°
-    lockTo090.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(90.0)));
-
-    // Lock to 120°
-    lockTo120.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(122.0)));
-
-    // Lock to 180°
-    lockTo180.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(180.0)));
-
-    // Lock to -120°
-    lockToM120.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(-122.0)));
-
-    // Lock to -90°
-    lockToM090.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(-90.0)));
-
-    // Lock to -60°
-    lockToM060.whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverLeftJoystick.getY(),
-            () -> -driverLeftJoystick.getX(),
-            () -> Rotation2d.fromDegrees(-58.0)));
-
-    drivePPProcessorAprilTag.debounce(0.10).onTrue(new DriveToProcessorCommandPP(drive));
-    drivePPLeftReefAprilTag
-        .debounce(0.10)
-        .onTrue(new DriveToBranchCommandPP(drive, s_Vision, ConstantsForHHS_Code.LeftSide));
-    drivePPRightReefAprilTag
-        .debounce(0.10)
-        .onTrue(new DriveToBranchCommandPP(drive, s_Vision, ConstantsForHHS_Code.RightSide));
-
-    drivePPLeftCoralStAprilTag
-        .debounce(0.10)
-        .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, ConstantsForHHS_Code.LeftSide));
-    drivePPRightCoralStAprilTag
-        .debounce(0.10)
-        .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, ConstantsForHHS_Code.RightSide));
-    // old way
-    //    driveLeftReefAprilTag.whileTrue(new DriveToBranchCommand(drive, s_Vision, -6.5));
-    //    driveRightReefAprilTag.whileTrue(new DriveToBranchCommand(drive, s_Vision, +6.5));
-    // driveLeftCoralAprilTag.whileTrue(new DriveToCoralCommand(drive, s_Vision, -6.5));
-    // driveRightCoralAprilTag.whileTrue(new DriveToCoralCommand(drive, s_Vision, +6.5));
-
-    // Drive to note example
-    //   driveToNote.whileTrue(new DriveToAprilTagCommand(drive, s_Vision));
-    // Lock to AprilTag example: ID 7 (blue speaker center)
-    // aimAtAprilTag.whileTrue(new AimAtAprilTagCommand(drive, s_Vision, 7));
+    // Operator - Right Joystick - Main Functions---------------------------
 
     ////////////////////////////////  CANdle test commands  //////////////////////////////
+    /*
+        new JoystickButton(operatorJoystick, 3)
+            .onTrue(new RunCommand(m_candleSubsystem::setColors, m_candleSubsystem));
+        new JoystickButton(operatorJoystick, 4)
+            .onTrue(new RunCommand(m_candleSubsystem::incrementAnimation, m_candleSubsystem));
+        new JoystickButton(operatorJoystick, 5)
+            .onTrue(new RunCommand(m_candleSubsystem::decrementAnimation, m_candleSubsystem));
 
+        new POVButton(operatorJoystick, Constants.MaxBrightnessAngle)
+            .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 1.0));
+        new POVButton(operatorJoystick, Constants.MidBrightnessAngle)
+            .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0.3));
+        new POVButton(operatorJoystick, Constants.ZeroBrightnessAngle)
+            .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0));
+        new POVButton(operatorJoystick, Constants.ChangeDirectionAngle)
+            .onTrue(new RunCommand(() -> m_candleSubsystem.toggleAnimDirection(), m_candleSubsystem));
+
+        new JoystickButton(operatorJoystick, 9)
+            .onTrue(new RunCommand(() -> m_candleSubsystem.clearAllAnims(), m_candleSubsystem));
+        new JoystickButton(operatorJoystick, 10)
+            .onTrue(new RunCommand(() -> m_candleSubsystem.toggle5VOverride(), m_candleSubsystem));
+    */
+
+    // Operator - Left  Joystick - Test Functions---------------------------
+
+    new JoystickButton(testOprJoystick, 1)
+        .debounce(0.10)
+        .onTrue(new HandlerHarvestCoral(s_Handler));
+    new JoystickButton(testOprJoystick, 1)
+        .debounce(0.10)
+        .onFalse(new InstantCommand(() -> s_Handler.stop(), s_Handler));
+
+    new JoystickButton(testOprJoystick, 3)
+        .debounce(0.10)
+        .onTrue(
+            new MM_ElbowToPosition(
+                s_Elbow, ElbowConstants.kStartAngle, ElbowConstants.kToleranceDegrees));
+
+    new JoystickButton(testOprJoystick, 4)
+        .debounce(0.10)
+        .onTrue(
+            new MM_ElbowToPosition(
+                s_Elbow, ElbowConstants.kProcessorAngle, ElbowConstants.kToleranceDegrees));
+
+    new JoystickButton(testOprJoystick, 5)
+        .debounce(0.10)
+        .onTrue(
+            new MM_ElevatorToPosition(
+                s_Elevator, ElevatorConstants.kStartPos, ElevatorConstants.kToleranceInches));
+    new JoystickButton(testOprJoystick, 6)
+        .debounce(0.10)
+        .onTrue(
+            new MM_ElevatorToPosition(
+                s_Elevator, ElevatorConstants.kLevel4Pos, ElevatorConstants.kToleranceInches));
+
+    new JoystickButton(testOprJoystick, 8)
+        .debounce(0.10)
+        .onTrue(
+            new MM_WristToPosition(
+                s_Wrist, WristConstants.kStartAngle, WristConstants.kToleranceDegrees));
+    new JoystickButton(testOprJoystick, 9)
+        .debounce(0.10)
+        .onTrue(
+            new MM_WristToPosition(
+                s_Wrist, WristConstants.kZeroOffset, WristConstants.kToleranceDegrees));
+
+
+
+    // Operator - Right  Joystick - Real Functions---------------------------
+
+    new JoystickButton(operatorJoystick, 1)
+        .debounce(0.10)
+        .onTrue(
+            new HandlerShootCoralOut(s_Handler).andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist)));
+    new JoystickButton(operatorJoystick, 2)
+        .debounce(0.10)
+        .onTrue(
+            new ArmCoralStation(s_Elevator, s_Elbow, s_Wrist)
+                .alongWith(new HandlerHarvestCoral(s_Handler)));
     new JoystickButton(operatorJoystick, 3)
-        .onTrue(new RunCommand(m_candleSubsystem::setColors, m_candleSubsystem));
+        .debounce(0.10)
+        .onTrue(new ArmLevel3(s_Elevator, s_Elbow, s_Wrist));
     new JoystickButton(operatorJoystick, 4)
-        .onTrue(new RunCommand(m_candleSubsystem::incrementAnimation, m_candleSubsystem));
+        .debounce(0.10)
+        .onTrue(new ArmLevel2(s_Elevator, s_Elbow, s_Wrist));
+
     new JoystickButton(operatorJoystick, 5)
-        .onTrue(new RunCommand(m_candleSubsystem::decrementAnimation, m_candleSubsystem));
+        .debounce(0.10)
+        .onTrue(new ArmPreLevel4(s_Elevator, s_Elbow, s_Wrist));
+    new JoystickButton(operatorJoystick, 5)
+        .debounce(0.10)
+        .onFalse(new ArmLevel4(s_Elevator, s_Elbow, s_Wrist));
 
-    new POVButton(operatorJoystick, Constants.MaxBrightnessAngle)
-        .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 1.0));
-    new POVButton(operatorJoystick, Constants.MidBrightnessAngle)
-        .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0.3));
-    new POVButton(operatorJoystick, Constants.ZeroBrightnessAngle)
-        .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0));
-    new POVButton(operatorJoystick, Constants.ChangeDirectionAngle)
-        .onTrue(new RunCommand(() -> m_candleSubsystem.toggleAnimDirection(), m_candleSubsystem));
+    new JoystickButton(operatorJoystick, 6)
+        .debounce(0.10)
+        .onTrue(new ArmLevel1(s_Elevator, s_Elbow, s_Wrist));
 
-    new JoystickButton(operatorJoystick, 9)
-        .onTrue(new RunCommand(() -> m_candleSubsystem.clearAllAnims(), m_candleSubsystem));
+    new JoystickButton(operatorJoystick, 7)
+        .debounce(0.10)
+        .onTrue(new ArmClimb(s_Elevator, s_Elbow, s_Wrist));
+    new JoystickButton(operatorJoystick, 8)
+        .debounce(0.10)
+        .onTrue(new ArmUnClimb(s_Elevator, s_Elbow, s_Wrist));
+
     new JoystickButton(operatorJoystick, 10)
-        .onTrue(new RunCommand(() -> m_candleSubsystem.toggle5VOverride(), m_candleSubsystem));
+        .debounce(0.10)
+        .onTrue(new ArmHome(s_Elevator, s_Elbow, s_Wrist));
+
+    new JoystickButton(operatorJoystick, 11)
+        .debounce(0.10)
+        .onTrue(new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, s_Handler));
+
+    new JoystickButton(operatorJoystick, 12)
+        .debounce(0.10)
+        .onTrue(new HandlerShootAlgaeOut(s_Handler));
+
+    new POVButton(operatorJoystick, 0)
+        .debounce(0.10)
+        .onTrue(
+            new ArmAlgaeHigh(s_Elevator, s_Elbow, s_Wrist)
+                .alongWith(new HandlerHarvestAlgae(s_Handler)));
+
+    new POVButton(operatorJoystick, 180)
+        .debounce(0.10)
+        .onTrue(
+            new ArmAlgaeLow(s_Elevator, s_Elbow, s_Wrist)
+                .alongWith(new HandlerHarvestAlgae(s_Handler)));
+
+    new POVButton(operatorJoystick, 90)
+        .debounce(0.10)
+        .onTrue(new ArmAlgaeProcessor(s_Elevator, s_Elbow, s_Wrist));
+
+    new POVButton(operatorJoystick, 270).debounce(0.10).onTrue(new HandlerHarvestAlgae(s_Handler));
   }
 
   /**

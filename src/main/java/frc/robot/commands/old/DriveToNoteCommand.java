@@ -30,11 +30,11 @@ public class DriveToNoteCommand extends Command {
 
   @Override
   public void execute() {
-    if (m_vision.rearCamTgtDectected()) {
+    if (m_vision.leftFrtCamTgtDectected()) {
       // Phase 1: Rotate until aligned
       if (!isAligned) {
-        if ((Math.abs(m_vision.getRearCamBestTgtYaw()) - Math.abs(targetYaw)) > yawTolerance) {
-          if (m_vision.getRearCamBestTgtYaw() < targetYaw) {
+        if ((Math.abs(m_vision.getleftFrtCamBestTgtYaw()) - Math.abs(targetYaw)) > yawTolerance) {
+          if (m_vision.getleftFrtCamBestTgtYaw() < targetYaw) {
             // Rotate CCW
             SmartDashboard.putString("DriveToNote Status", "CCW");
             m_drive.driveWithSpeeds(0, 0, rotationSpeed, false);
@@ -49,13 +49,13 @@ public class DriveToNoteCommand extends Command {
         }
       } else {
         // Phase 2: Drive forward and strafe if necessary
-        if (m_vision.getRearCamBestTgtYaw() < targetYaw
-            && (targetYaw - m_vision.getRearCamBestTgtYaw()) > strafeTolerance) {
+        if (m_vision.getleftFrtCamBestTgtYaw() < targetYaw
+            && (targetYaw - m_vision.getleftFrtCamBestTgtYaw()) > strafeTolerance) {
           // Slide left
           SmartDashboard.putString("DriveToNote Status", "Slide left");
           m_drive.driveWithSpeeds(xDriveSpeed, yDriveSpeed, 0, false);
-        } else if (m_vision.getRearCamBestTgtYaw() > targetYaw
-            && (targetYaw + m_vision.getRearCamBestTgtYaw()) > strafeTolerance) {
+        } else if (m_vision.getleftFrtCamBestTgtYaw() > targetYaw
+            && (targetYaw + m_vision.getleftFrtCamBestTgtYaw()) > strafeTolerance) {
           // Slide right
           SmartDashboard.putString("DriveToNote Status", "Slide right");
           m_drive.driveWithSpeeds(xDriveSpeed, -yDriveSpeed, 0, false);
