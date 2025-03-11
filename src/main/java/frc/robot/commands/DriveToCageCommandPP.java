@@ -38,23 +38,26 @@ public class DriveToCageCommandPP extends Command {
 
     // The rotation component in these poses represents the direction of travel
     Pose2d startPt = m_drive.getPose();
+    double currentRotation = m_drive.getPose().getRotation().getDegrees();
+    if (Math.abs(currentRotation) > 90.0) endPtHoloRotation = 180.0;
+    else endPtHoloRotation = 0.0;
     Pose2d endPt;
     if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Red)) {
       //  Real Coordinates
-      endPtX = 9.5;
+      endPtX = 9.8;
       if (offset == kCenter) endPtY = 1.915;
       if (offset == kLeftSide) endPtY = 0.815;
       if (offset == kRightSide) endPtY = 3.015;
-      endPtHoloRotation = 180.0;
+      // endPtHoloRotation = 180.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Blue)) {
-      endPtX = 8.0;
+      endPtX = 7.75;
       if (offset == kCenter) endPtY = 6.138;
       if (offset == kLeftSide) endPtY = 7.238;
       if (offset == kRightSide) endPtY = 5.038;
-      endPtHoloRotation = 0.0;
+      // endPtHoloRotation = 0.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else {
       endPt = startPt;
@@ -68,8 +71,8 @@ public class DriveToCageCommandPP extends Command {
                 4.0,
                 4.0,
                 // 3.0, 3.0,      4.0s seem to work better
-                Units.degreesToRadians(360),
-                Units.degreesToRadians(540)),
+                Units.degreesToRadians(540),
+                Units.degreesToRadians(720)),
             null,
             new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
 

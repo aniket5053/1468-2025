@@ -11,20 +11,15 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmLevel3 extends SequentialCommandGroup {
-  // Since Level 3 is not low, start elbow to get arm close to vertical,
-  // and then extend elevator, wrist last to insure it's free to move
-  public ArmLevel3(ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist) {
+  // Since Level 3 just keeps elev at 0, move wrist delay elbow to avoid hitting reef.
+  public ArmLevel3(
+      ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new MM_ElbowToPosition(
-                elbow, ElbowConstants.kLevel3Angle, ElbowConstants.kToleranceDegrees),
+            new MM_ElevatorToPosition(elevator, ElevatorConstants.kLevel3Pos, tolerance),
+            new MM_WristToPosition(wrist, WristConstants.kLevel3Angle, tolerance),
             Commands.sequence(
-                new WaitCommand(0.2),
-                new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kLevel3Pos, ElevatorConstants.kToleranceInches)),
-            Commands.sequence(
-                new WaitCommand(0.3),
-                new MM_WristToPosition(
-                    wrist, WristConstants.kLevel3Angle, WristConstants.kToleranceDegrees))));
+                new WaitCommand(0.25), // TA TODO: Optimize delay
+                new MM_ElbowToPosition(elbow, ElbowConstants.kLevel3Angle, tolerance))));
   }
 }

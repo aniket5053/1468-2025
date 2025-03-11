@@ -60,16 +60,18 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /* Configure Motion Magic */
     // TODO: TA - Optimize MM for Elevator
+    // was 3V,10A smooth but too slow
+    // 4V, 20A smooth but too fast
     MotionMagicConfigs mm = cfg.MotionMagic;
     mm.withMotionMagicCruiseVelocity(
-            RotationsPerSecond.of(3)) // was 4 (mechanism) rotations per second cruise
+            RotationsPerSecond.of(3.5)) // (mechanism) rotations per second cruise
         .withMotionMagicAcceleration(
-            RotationsPerSecondPerSecond.of(
-                10)) // was 20 Take approximately 0.2 seconds to reach max vel
+            RotationsPerSecondPerSecond.of(10)) // Take approximately 0.2 seconds to reach max vel
         // Take approximately 0.2 seconds to reach max accel
         .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
 
     Slot0Configs slot0 = cfg.Slot0;
+    slot0.kG = 0.05; // fight the gravity!
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
     slot0.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
@@ -79,7 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     cfg.withCurrentLimits(
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Amps.of(80))
+            .withStatorCurrentLimit(Amps.of(60))
             .withStatorCurrentLimitEnable(true));
 
     StatusCode statusLt = StatusCode.StatusCodeNotInitialized;

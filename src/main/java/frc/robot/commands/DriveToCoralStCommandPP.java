@@ -85,11 +85,11 @@ public class DriveToCoralStCommandPP extends Command {
         new PathPlannerPath(
             wayPoints,
             new PathConstraints(
-                3.0,
-                3.0, // was 4
+                4.0,
+                4.0, // was 4
                 // 3.0, 3.0,
-                Units.degreesToRadians(360),
-                Units.degreesToRadians(540)), // was 540
+                Units.degreesToRadians(540),
+                Units.degreesToRadians(720)), // was 540
             null,
             //  new
             // IdealStartingState(m_drive.getFFCharacterizationVelocity()*TunerConstants.kDriveGearRatio, m_drive.getRotation()),

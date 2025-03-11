@@ -5,51 +5,196 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "Center2AlgaeStep1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center2AlgaeStep1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldHomePos"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Center2AlgaeStep2"
+            "name": "ArmToL4"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Center2AlgaeStep3"
+            "name": "Shoot"
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "Center2AlgaeStep4"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center2AlgaeStep2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldHomePos"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Center2AlgaeStep5"
+            "name": "GetAlgaeLow"
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "Center3AlgaeStep6"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center2AlgaeStep3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaeHomePos"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Center3AlgaeStep7"
+            "name": "ShootAlgae"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center2AlgaeStep4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaeHomePos"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GetAlgaeHigh"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center2AlgaeStep5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaeHomePos"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAlgae"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center3AlgaeStep6"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaeHomePos"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GetAlgaeHigh"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center3AlgaeStep7"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaeHomePos"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAlgae"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "HoldAlgaeHomePos"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

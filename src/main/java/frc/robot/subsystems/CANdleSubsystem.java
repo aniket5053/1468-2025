@@ -29,8 +29,8 @@
  * animation Start Button: Switch to setting the first 8 LEDs a unique combination of colors POV
  * Right: Configure maximum brightness for the CANdle POV Down: Configure medium brightness for the
  * CANdle POV Left: Configure brightness to 0 for the CANdle POV Up: Change the direction of Rainbow
- * and Fire, must re-select the animation to take affect A: Print the VBat voltage in Volts B: Print
- * the 5V voltage in Volts X: Print the current in amps Y: Print the temperature in degrees C
+ * * and Fire, must re-select the animation to take affect A: Print the VBat voltage in Volts B:
+ * Print the 5V voltage in Volts X: Print the current in amps Y: Print the temperature in degrees C
  *
  * <p>Supported Version: - CANdle: 22.1.1.0
  */
@@ -76,8 +76,8 @@ public class CANdleSubsystem extends SubsystemBase {
 
   private AnimationTypes m_currentAnimation;
 
-  public CANdleSubsystem(Joystick joy) {
-    this.joystick = joy;
+  public CANdleSubsystem(Joystick joystick) {
+    this.joystick = joystick;
     changeAnimation(AnimationTypes.SetAll);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
@@ -341,36 +341,46 @@ public class CANdleSubsystem extends SubsystemBase {
     m_clearAllAnims = true;
   }
 
+  public void setWhite() {
+    m_candle.setLEDs(255, 255, 255, 0, 0, 8);
+  }
+
+  public void setGreen() {
+    m_candle.setLEDs(0, 255, 0, 0, 0, 8);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (m_toAnimate == null) {
-      if (!m_setAnim) {
-        /* Only setLEDs once, because every set will transmit a frame */
-        m_candle.setLEDs(255, 255, 255, 0, 0, 1);
-        m_candle.setLEDs(255, 255, 0, 0, 1, 1);
-        m_candle.setLEDs(255, 0, 255, 0, 2, 1);
-        m_candle.setLEDs(255, 0, 0, 0, 3, 1);
-        m_candle.setLEDs(0, 255, 255, 0, 4, 1);
-        m_candle.setLEDs(0, 255, 0, 0, 5, 1);
-        m_candle.setLEDs(0, 0, 0, 0, 6, 1);
-        m_candle.setLEDs(0, 0, 255, 0, 7, 1);
-        m_setAnim = true;
-      }
-    } else {
-      m_toAnimate.setSpeed((joystick.getY() + 1.0) / 2.0);
-      m_candle.animate(m_toAnimate, m_candleChannel);
-      m_setAnim = false;
-    }
-    m_candle.modulateVBatOutput(joystick.getY());
+    /*
 
-    if (m_clearAllAnims) {
-      m_clearAllAnims = false;
-      for (int i = 0; i < 10; ++i) {
-        m_candle.clearAnimation(i);
-      }
-    }
+        if (m_toAnimate == null) {
+          if (!m_setAnim) {
+            // Only setLEDs once, because every set will transmit a frame
+            m_candle.setLEDs(255, 255, 255, 0, 0, 1);
+            m_candle.setLEDs(255, 255, 0, 0, 1, 1);
+            m_candle.setLEDs(255, 0, 255, 0, 2, 1);
+            m_candle.setLEDs(255, 0, 0, 0, 3, 1);
+            m_candle.setLEDs(0, 255, 255, 0, 4, 1);
+            m_candle.setLEDs(0, 255, 0, 0, 5, 1);
+            m_candle.setLEDs(0, 0, 0, 0, 6, 1);
+            m_candle.setLEDs(0, 0, 255, 0, 7, 1);
+            m_setAnim = true;
+          }
+        } else {
+          m_toAnimate.setSpeed((joystick.getY() + 1.0) / 2.0);
+          m_candle.animate(m_toAnimate, m_candleChannel);
+          m_setAnim = false;
+        }
+        m_candle.modulateVBatOutput(joystick.getY());
 
+        if (m_clearAllAnims) {
+          m_clearAllAnims = false;
+          for (int i = 0; i < 10; ++i) {
+            m_candle.clearAnimation(i);
+          }
+        }
+    */
     SmartDashboard.putNumber("CANdle Vbat =", getVbat());
     SmartDashboard.putNumber("CANdle   5V =", get5V());
     SmartDashboard.putNumber("CANdle Curnt=", getCurrent());

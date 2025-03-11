@@ -11,20 +11,19 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmClimb extends SequentialCommandGroup {
-  // First start wrist to insure it wont get wedged into elevator,
-  // then lower elevator, so it's not sticking out too far, lastly, lower elbow angle
-  public ArmClimb(ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist) {
+  // "UNclimb" command must be selected first, which will have elevator and wrist in correct
+  // position, but for safety reasons delay wrist
+  // so now just move elbow
+  public ArmClimb(
+      ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new MM_ElevatorToPosition(
-                elevator, ElevatorConstants.kClimbPos, ElevatorConstants.kToleranceInches),
+            new MM_ElevatorToPosition(elevator, ElevatorConstants.kClimbPos, tolerance),
             Commands.sequence(
-                new WaitCommand(0.2),
-                new MM_WristToPosition(
-                    wrist, WristConstants.kClimbAngle, WristConstants.kToleranceDegrees),
-                Commands.sequence(
-                    new WaitCommand(0.45),
-                    new MM_ElbowToPosition(
-                        elbow, ElbowConstants.kClimbAngle, ElbowConstants.kToleranceDegrees)))));
+                new WaitCommand(0.25),
+                new MM_WristToPosition(wrist, WristConstants.kClimbAngle, tolerance)),
+            Commands.sequence(
+                //                new WaitCommand(0.45),
+                new MM_ElbowToPosition(elbow, ElbowConstants.kClimbAngle, tolerance))));
   }
 }

@@ -8,29 +8,23 @@ import frc.robot.ConstantsMechanisms.ElevatorConstants;
 import frc.robot.ConstantsMechanisms.WristConstants;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmAlgaeBargeNet extends SequentialCommandGroup {
-  // Since Barge/Net is very high, start elbow to get arm close to vertical,
-  // and then extend elevator, wrist last to insure it's free to move
+  // This command is only activated after ArmHomeWithAlgae,
+  // so the arm is fairly vertical, elevator slightly up, and wrist at 0 prior to call.
+  // so no wait delays needed - keeping small wrist delay for safety (lab button pushing)
+
   public ArmAlgaeBargeNet(
-      ElevatorSubsystem elevator,
-      ElbowSubsystem elbow,
-      WristSubsystem wrist,
-      HandlerSubsystem s_Handler) {
+      ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new HandlerHarvestAlgae(s_Handler),
-            new MM_ElbowToPosition(
-                elbow, ElbowConstants.kBargeNetAngle, ElbowConstants.kToleranceDegrees),
+            new MM_ElbowToPosition(elbow, ElbowConstants.kBargeNetAngle, tolerance),
             Commands.sequence(
-                new WaitCommand(0.05),
-                new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kBargeNetPos, ElevatorConstants.kToleranceInches)),
+                //                new WaitCommand(0.05),
+                new MM_ElevatorToPosition(elevator, ElevatorConstants.kBargeNetPos, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.40),
-                new MM_WristToPosition(
-                    wrist, WristConstants.kBargeNetAngle, WristConstants.kToleranceDegrees))));
+                new WaitCommand(0.15),
+                new MM_WristToPosition(wrist, WristConstants.kBargeNetAngle, tolerance))));
   }
 }

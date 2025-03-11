@@ -39,9 +39,12 @@ public class DriveToProcessorCommandPP extends Command {
     if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Red)) {
       //  Real Coordinates
-      endPtX = 11.561;
-      endPtY = 7.485;
-      endPtHoloRotation = 90.0;
+      //     endPtX = 11.561;
+      //     endPtY = 7.485;
+      //     endPtHoloRotation = 90.0;
+      endPtX = 15.0;
+      endPtY = 6;
+      endPtHoloRotation = -90.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Blue)) {
@@ -61,8 +64,8 @@ public class DriveToProcessorCommandPP extends Command {
                 4.0,
                 4.0,
                 // 3.0, 3.0,      4.0s seem to work better
-                Units.degreesToRadians(360),
-                Units.degreesToRadians(540)),
+                Units.degreesToRadians(540),
+                Units.degreesToRadians(720)),
             null,
             new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
 

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.0,
-        "y": 2.807
+        "x": 4.998120591385912,
+        "y": 2.8168190388830716
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.5,
-        "y": 1.9409745962155611
+        "x": 5.498120591385912,
+        "y": 1.9507936350986328
       },
       "isLocked": false,
       "linkedName": "LtStp1EndPt"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 120.01243802894311
   },
   "useDefaultConstraints": true
 }

@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.AllMotorsBrake;
+import frc.robot.commands.AllMotorsCoast;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -105,30 +107,48 @@ public class Robot extends LoggedRobot {
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
 
+    //   if (robotContainer.s_Vision.getLeftFrtCamNumOfTgts()
+    //       < robotContainer.s_Vision.getRightFrtCamNumOfTgts()) {
+
     // Correct pose estimate with vision measurements
     var rightFrtCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingrightFrtCamTgts();
     rightFrtCamPoseEst.ifPresent(
-        est -> {
+        estRt -> {
           // Change our trust in the measurement based on the tags we can see
           var estStdDevs = robotContainer.s_Vision.getEstimationrightFrtCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
+              estRt.estimatedPose.toPose2d(), estRt.timestampSeconds, estStdDevs);
 
+          SmartDashboard.putNumber("RightCam X", estRt.estimatedPose.toPose2d().getX());
+          SmartDashboard.putNumber("RightCam Y", estRt.estimatedPose.toPose2d().getY());
+          SmartDashboard.putNumber(
+              "RightCam Yaw", estRt.estimatedPose.toPose2d().getRotation().getDegrees());
+        });
+    //   } else {
     var leftFrtCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingleftFrtCamTgts();
     leftFrtCamPoseEst.ifPresent(
-        est -> {
+        estLt -> {
           // Change our trust in the measurement based on the tags we can see
           var estStdDevs = robotContainer.s_Vision.getEstimationleftFrtCamStdDevs();
 
           robotContainer.drive.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+              estLt.estimatedPose.toPose2d(), estLt.timestampSeconds, estStdDevs);
+
+          SmartDashboard.putNumber("LeftCam X", estLt.estimatedPose.toPose2d().getX());
+          SmartDashboard.putNumber("LeftCam Y", estLt.estimatedPose.toPose2d().getY());
+          SmartDashboard.putNumber(
+              "LeftCam Yaw", estLt.estimatedPose.toPose2d().getRotation().getDegrees());
         });
+    //   }
+
+    SmartDashboard.putNumber("LeftCamTgts", robotContainer.s_Vision.getLeftFrtCamNumOfTgts());
+    SmartDashboard.putNumber("RightCamTgts", robotContainer.s_Vision.getRightFrtCamNumOfTgts());
 
     SmartDashboard.putNumber("Robot X", robotContainer.drive.getPose().getX());
     SmartDashboard.putNumber("Robot Y", robotContainer.drive.getPose().getY());
     SmartDashboard.putNumber("Robot Yaw", robotContainer.drive.getRotation().getDegrees());
+
     SmartDashboard.putNumber("Mod0 in Rotations", robotContainer.drive.getModuleAngle(0) / 360.0);
     SmartDashboard.putNumber("Mod1 in Rotations", robotContainer.drive.getModuleAngle(1) / 360.0);
     SmartDashboard.putNumber("Mod2 in Rotations", robotContainer.drive.getModuleAngle(2) / 360.0);
@@ -145,6 +165,22 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+
+    if (robotContainer.driverRightJoystick.getRawButton(10))
+      new AllMotorsBrake(
+              robotContainer.s_Elbow,
+              robotContainer.s_Elevator,
+              robotContainer.s_Wrist,
+              robotContainer.drive)
+          .schedule();
+    if (robotContainer.driverRightJoystick.getRawButton(11))
+      new AllMotorsCoast(
+              robotContainer.s_Elbow,
+              robotContainer.s_Elevator,
+              robotContainer.s_Wrist,
+              robotContainer.drive)
+          .schedule();
+
     // Run the scheduler in disabled mode
     CommandScheduler.getInstance().run();
   }

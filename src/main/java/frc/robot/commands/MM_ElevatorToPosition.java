@@ -47,8 +47,8 @@ public class MM_ElevatorToPosition extends Command {
     // return Math.abs(ElevatorSubsystem.getElevatorPosition() - targetPositionRotations) <
     // tolerance;
     if (Math.abs(
-            ElevatorSubsystem.getElevatorPosition()
-                - targetPositionInches / kEncoderRotation2Inches)
+            ElevatorSubsystem.getElevatorPosition() // pos goes neg not pos
+                + targetPositionInches / kEncoderRotation2Inches)
         < toleranceInInches / kEncoderRotation2Inches) {
       counter++;
     }

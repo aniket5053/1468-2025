@@ -11,21 +11,21 @@ import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
-public class ArmHomeWithAlgae extends SequentialCommandGroup {
-  // First start hold wrist still and move elbow back to not have algae get dislodged,
-  // then lower elevator
-  public ArmHomeWithAlgae(
+public class ArmHomeAfterAlgaeShot extends SequentialCommandGroup {
+  // this command is only executed after shooting Algae Out, but is optimized for a Barge/Net shot
+  // since the elevator is so high
+  // note that for a processor shot, the elevator is up a little to allow for wrist motion.
+  public ArmHomeAfterAlgaeShot(
       ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new MM_WristToPosition(wrist, WristConstants.kHomeWithAlgaeAngle, tolerance),
+            new MM_WristToPosition(wrist, WristConstants.kHomeAngle, tolerance),
+            // Force elevator command to finish so that we can reset 0 position
             Commands.sequence(
-                //                new WaitCommand(0.25),
-                new MM_ElbowToPosition(elbow, ElbowConstants.kHomeAngle, tolerance)),
-            Commands.sequence(
-                new WaitCommand(0.4),
-                // Force elevator command to finish so that we can reset 0 position
                 new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, .5),
-                new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator))));
+                new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator)),
+            Commands.sequence(
+                new WaitCommand(0.25),
+                new MM_ElbowToPosition(elbow, ElbowConstants.kHomeAngle, tolerance))));
   }
 }

@@ -8,9 +8,11 @@ import frc.robot.subsystems.HandlerSubsystem;
 public class HandlerHarvestAlgae extends Command {
   private final HandlerSubsystem handlerSubsystem;
   private int counter;
+  private boolean holdForever;
 
-  public HandlerHarvestAlgae(HandlerSubsystem handlerSubsystem) {
+  public HandlerHarvestAlgae(HandlerSubsystem handlerSubsystem, boolean holdForever) {
     this.handlerSubsystem = handlerSubsystem;
+    this.holdForever = holdForever;
     addRequirements(handlerSubsystem);
   }
 
@@ -35,8 +37,11 @@ public class HandlerHarvestAlgae extends Command {
 
   @Override
   public boolean isFinished() {
-    // Stop the motor 50 counts after the limit switch turns true
-    //    return handlerSubsystem.getLimitSwitch();
-    return (counter >= 500);
+    // Use holdForever in TeleOp so algae is never let go of, a shoot algae command will override
+    // the hold
+    // For Auto we can holdForever or Stop the motor 5 counts after the limit switch turns true
+    // *** If holdForever is used in autonomous will need to "race" with another command to end
+    if (holdForever) return false;
+    else return (counter >= 5);
   }
 }

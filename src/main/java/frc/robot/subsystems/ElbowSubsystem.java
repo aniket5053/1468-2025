@@ -37,6 +37,9 @@ public class ElbowSubsystem extends SubsystemBase {
 
   double ltSpeed, rtSpeed;
 
+  private double currentLeftPos;
+  private double currentRightPos;
+
   /** Subsystem for controlling the Elbow */
   public ElbowSubsystem() {
 
@@ -60,19 +63,20 @@ public class ElbowSubsystem extends SubsystemBase {
 
     /* Configure gear ratio */
     FeedbackConfigs fdb = cfg.Feedback;
-    fdb.SensorToMechanismRatio = 45.0; // 45 rotor rotations per mechanism rotation
-    // TODO: TA  - need to set starting position relative to absolute encoder
-    setElbowPosition((kStartAngle - kZeroOffset) / kEncoderRotation2Degrees);
+    // TA - was 45:1, but now updaed to 60:1
+    // fdb.SensorToMechanismRatio = 45.0; // 45 rotor rotations per mechanism rotation
+    fdb.SensorToMechanismRatio =
+        75.0; // 75 rotor rotations per mechanism rotation - gear box reduction
 
     /* Configure Motion Magic */
     // TODO: TA - Optimize MM for Elevator
+    // 1.5V, 1A worked but was slow -
+    // 1V, 5A worked but too fast
     MotionMagicConfigs mm = cfg.MotionMagic;
     mm.withMotionMagicCruiseVelocity(
-            RotationsPerSecond.of(
-                1.5)) // was .5, too slow was 2 too fast(mechanism) rotations per second cruise
+            RotationsPerSecond.of(0.75)) // (mechanism) rotations per second cruise
         .withMotionMagicAcceleration(
-            RotationsPerSecondPerSecond.of(
-                1)) // was 2 was 5 Take approximately 0.2 seconds to reach max vel
+            RotationsPerSecondPerSecond.of(2.25)) // Take approximately 0.2 seconds to reach max vel
         // Take approximately 0.2 seconds to reach max accel
         .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
 
@@ -117,6 +121,14 @@ public class ElbowSubsystem extends SubsystemBase {
             ? SensorDirectionValue.Clockwise_Positive
             : SensorDirectionValue.CounterClockwise_Positive;
     elbowCanCoder.getConfigurator().apply(cancoderConfig);
+
+    // TODO: TA  - need to set starting position relative to absolute encoder
+
+    double tempCanCoderDegrees = elbowCanCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
+
+    if (tempCanCoderDegrees > 0.0) tempCanCoderDegrees = tempCanCoderDegrees - 360.0;
+    double tempElbowAngle = tempCanCoderDegrees + 34.541;
+    setElbowPosition((-tempElbowAngle) / kEncoderRotation2Degrees);
   }
 
   /* Set  Elbow motors to Brake Mode */
@@ -141,24 +153,12 @@ public class ElbowSubsystem extends SubsystemBase {
   public void setElbowMagicMoPos(double pos) {
     m_leftElbowMotor.setControl(m_mmReqLt.withPosition(-pos).withSlot(0));
     m_rightElbowMotor.setControl(m_mmReqRt.withPosition(pos).withSlot(0));
-
-    SmartDashboard.putNumber("Input angle", pos);
   }
 
   /* Set Elbow motor Position*/
   public void setElbowPosition(double pos) {
     m_leftElbowMotor.setPosition(Rotations.of(-pos));
     m_rightElbowMotor.setPosition(Rotations.of(pos));
-  }
-
-  /* Set Elbow motor Position*/
-  public double getLtElbowPosition() {
-    return m_leftElbowMotor.getPosition().getValueAsDouble();
-  }
-
-  /* Set Elbow motor Position*/
-  public double getRtElbowPosition() {
-    return m_rightElbowMotor.getPosition().getValueAsDouble();
   }
 
   public void stop() {
@@ -168,6 +168,9 @@ public class ElbowSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    currentLeftPos = m_leftElbowMotor.getPosition().getValueAsDouble();
+    currentRightPos = m_rightElbowMotor.getPosition().getValueAsDouble();
 
     // Put the speed on SmartDashboard
 
@@ -189,5 +192,16 @@ public class ElbowSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber(
         "ElbowAbsEnc Angle", elbowCanCoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+  }
+
+  /* Set Elbow motor Position*/
+  public double getLtElbowPosition() {
+    SmartDashboard.putNumber("Elbow LtMtr Angle in GET", currentLeftPos * kEncoderRotation2Degrees);
+    return currentLeftPos;
+  }
+
+  /* Set Elbow motor Position*/
+  public double getRtElbowPosition() {
+    return currentRightPos;
   }
 }

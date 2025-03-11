@@ -12,7 +12,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +22,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class VisionSubsystem extends SubsystemBase {
-  // Create PhotonCamera objects
-  private final PhotonCamera rightFrtCamera = new PhotonCamera("rightFrtCamera");
-  private final PhotonCamera leftFrtCamera = new PhotonCamera("leftFrtCamera");
 
   // Construct PhotonPoseEstimator
 
@@ -35,27 +31,64 @@ public class VisionSubsystem extends SubsystemBase {
   // rightFrt Left Cam:  (R,P,Y) = (-5.0, -20.1, -10.0 ) degrees
   // rightFrt Right Cam: (R,P,Y) = (-5.0, -20.1, +10.0 ) degrees
 
+  // Original XYZ for Right Camera (12.8343, -9.9354, -11.039) - these numbers are slightly off
+  // vector from what's in CAD but close - SZ
+  private final double rightX = 12.8439; // inch
+  private final double rightY = -9.9281;
+  private final double rightZ = -11.0344;
+
+  // Original XYZ for Left Camera (12.8343, 9.9354, -11.039) - these numbers are slightly off vector
+  // from what's in CAD but close - SZ
+  private final double leftX = 12.8439; // inch
+  private final double leftY = 9.9281;
+  private final double leftZ = -11.0344;
+
+  // Normal unit vector orthogonal to camera YZ plane/x-axis pointing towards center of robot
+  private final double leftNormalX = -0.9517; // inch
+  private final double leftNormalY = -0.1711;
+  private final double leftNormalZ = -0.255; // was +
+
+  private final double rightNormalX = -0.9517; // inch
+  private final double rightNormalY = 0.1711;
+  private final double rightNormalZ = -0.255; // was +
+  // TA TODO: Must optimize - started with 3.0, did not reach reef, 2.5 was very inaccurate, but
+  // reached
+  private final double scalingFactor = 0; // was 2.75 to find camera focus position
+
+  // Calculates new camera positions based on scaling factor
+
+  private final double adjustedRightX = rightX + (scalingFactor * rightNormalX);
+  private final double adjustedRightY = rightY + (scalingFactor * rightNormalY);
+  private final double adjustedRightZ = rightZ + (scalingFactor * rightNormalZ);
+
+  private final double adjustedLeftX = leftX + (scalingFactor * leftNormalX);
+  private final double adjustedLeftY = leftY + (scalingFactor * leftNormalY);
+  private final double adjustedLeftZ = leftZ + (scalingFactor * leftNormalZ);
+
   private final Transform3d robotToRightFrtCamera =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(12.8343), // verified correct
-              Units.inchesToMeters(-9.9354), // verified negative is correct
-              Units.inchesToMeters(-11.039)), // verified correct
+              Units.inchesToMeters(adjustedRightX), // verified correct, 12.8343
+              Units.inchesToMeters(adjustedRightY), // verified negative is correct
+              Units.inchesToMeters(adjustedRightZ)), // verified correct
           new Rotation3d(
               Units.degreesToRadians(+5.0), // was -
-              Units.degreesToRadians(-20.1), // verified negative is correct -20.1
-              Units.degreesToRadians(-10.5))); // verified negative is correct
+              Units.degreesToRadians(
+                  -15.1), // verified negative is correct -20.1 // 3/1 update: HAVE NOT VERIFIED
+              // (but robot drives fine) -
+              // SZ
+              Units.degreesToRadians(-7.5))); // verified negative is correct - was 10.5
 
   private final Transform3d robotToLeftFrtCamera =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(12.8343), // verified correct
-              Units.inchesToMeters(9.9354), // verified correct
-              Units.inchesToMeters(-11.039)), // verified correct
+              Units.inchesToMeters(adjustedLeftX), // verified correct
+              Units.inchesToMeters(adjustedLeftY), // verified correct
+              Units.inchesToMeters(adjustedLeftZ)), // verified correct
           new Rotation3d(
               Units.degreesToRadians(-5.0), // was -
               Units.degreesToRadians(-15.1), // verified negative is correct  -15.1
-              Units.degreesToRadians(+10.5))); // verified positive is correct
+              Units.degreesToRadians(+7.5))); // verified positive is correct - was 10.5
 
   // Old Camera setup //////////////////////////////////////////////////////
   /*
@@ -77,21 +110,41 @@ public class VisionSubsystem extends SubsystemBase {
   */
   // Old Camera setup //////////////////////////////////////////////////////
 
-  private final PoseStrategy poseStrategy =
-      PoseStrategy
-          .MULTI_TAG_PNP_ON_COPROCESSOR; // TODO: Ensure that your camera is calibrated and 3D mode
-  // is enabled. Read
+  private final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+
+  // TODO: Ensure that your camera is calibrated and 3D mode is enabled. Read
   // https://docs.photonvision.org/en/v2025.0.0-beta-8/docs/apriltag-pipelines/multitag.html#multitag-localization
+  // TODO: // The field from AprilTagFields will be different depending on the game.
+  //  private final AprilTagFieldLayout aprilTagFieldLayout =
+  //      AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+
   private final AprilTagFieldLayout aprilTagFieldLayout =
-      AprilTagFields.k2025Reefscape.loadAprilTagLayoutField(); // TODO: // The field from
-  // AprilTagFields will be different
-  // depending on the game.
+      AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();
 
-  PhotonPoseEstimator rightFrtCamPoseEstimator =
-      new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToRightFrtCamera);
+  private final PhotonCamera rightFrtCamera;
+  private final PhotonCamera leftFrtCamera;
+  private final PhotonPoseEstimator rightFrtCamPoseEstimator;
+  private final PhotonPoseEstimator leftFrtCamPoseEstimator;
 
-  PhotonPoseEstimator leftFrtCamPoseEstimator =
-      new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToLeftFrtCamera);
+  private Matrix<N3, N1> currightFrtCamStdDevs;
+  private Matrix<N3, N1> curleftFrtCamStdDevs;
+
+  public VisionSubsystem() {
+    // Create PhotonCamera objects
+    rightFrtCamera = new PhotonCamera("rightFrtCamera");
+    leftFrtCamera = new PhotonCamera("leftFrtCamera");
+    rightFrtCamPoseEstimator =
+        new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToRightFrtCamera);
+    leftFrtCamPoseEstimator =
+        new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToLeftFrtCamera);
+
+    rightFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    leftFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    //
+    // rightFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    //
+    // leftFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+  }
 
   // Initialize variables (default if rightFrtCameraTargetResults is empty)
   private boolean rightFrtCameraHasTargets = false;
@@ -115,6 +168,9 @@ public class VisionSubsystem extends SubsystemBase {
   private double leftFrtCameraBestTargetX = 0;
   private double leftFrtCameraBestTargetY = 0;
 
+  double LeftCamNumOfTgts = 0;
+  double RightCamNumOfTgts = 0;
+
   double TgtID = 99.0;
   // some variables to override photonVision "Best" with our own "best" (based on area only)
   double ltCamTgt0Area = 0.0;
@@ -122,20 +178,18 @@ public class VisionSubsystem extends SubsystemBase {
   double rtCamTgt0Area = 0.0;
   double rtCamTgt1Area = 0.0;
 
-  private Matrix<N3, N1> currightFrtCamStdDevs;
-  private Matrix<N3, N1> curleftFrtCamStdDevs;
-
   // TA TODO: RIght now have only 1 Single Tag StdDev, s/b OK, need to calibrate multitag StdDevs!!!
   public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
   // public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.025, 0.025, .1);
-  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs =
-      VecBuilder.fill(0.025, 0.025, .1);
-  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .4);
 
-  public VisionSubsystem() {
-    // Additional initialization if needed
-  }
+  // These 2 constantly bounced off each other, try sligjtly lower values to average them
+  // public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.025, 0.025,
+  // .1);
+  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.025, 0.025,
+  // .1);
+  // <1, 1, 2> too slow - was .5,.5,1.0  - still a little slow and yaw mostly robot gyro
+  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.3, 0.3, .5);
+  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.3, 0.3, .5);
 
   @Override
   public void periodic() {
@@ -280,24 +334,28 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Publish to SmartDashboard
 
-    SmartDashboard.putNumber("DriveTo AprilTag", TgtID);
+    // SmartDashboard.putNumber("DriveTo AprilTag", TgtID);
 
-    SmartDashboard.putBoolean("RightFrtCam Targets?   ", rightFrtCameraHasTargets);
-    SmartDashboard.putBoolean("Mult RightFrtCam Trgts?", multiplerightFrtCameraTargets);
+    // SmartDashboard.putBoolean("RightFrtCam Targets?   ", rightFrtCameraHasTargets);
+    // SmartDashboard.putBoolean("Mult RightFrtCam Trgts?", multiplerightFrtCameraTargets);
     //   SmartDashboard.putString("Mult rightFrtCam IDs", rightFrtCameraAllIdsString);
-    SmartDashboard.putNumber("BestRightFrtCam Tgt ID ", rightFrtCameraBestTargetId);
-    SmartDashboard.putNumber("BestRightFrtCam Tgt Area", rightFrtCameraBestTargetArea);
+    // SmartDashboard.putNumber("BestRightFrtCam Tgt ID ", rightFrtCameraBestTargetId);
+    // SmartDashboard.putNumber("BestRightFrtCam Tgt Area", rightFrtCameraBestTargetArea);
 
-    SmartDashboard.putBoolean("leftFrtCam Targets?   ", leftFrtCameraHasTargets);
-    SmartDashboard.putBoolean("Mult leftFrtCam Trgts?", multipleleftFrtCameraTargets);
+    // SmartDashboard.putBoolean("leftFrtCam Targets?   ", leftFrtCameraHasTargets);
+    // SmartDashboard.putBoolean("Mult leftFrtCam Trgts?", multipleleftFrtCameraTargets);
     //   SmartDashboard.putString("Multiple leftFrtCam IDs", leftFrtCameaAllIdsString);
-    SmartDashboard.putNumber("BestleftFrtCam Tgt ID ", leftFrtCameraBestTargetId);
-    SmartDashboard.putNumber("BestleftFrtCam Tgt Area", leftFrtCameraBestTargetArea);
+    // SmartDashboard.putNumber("BestleftFrtCam Tgt ID ", leftFrtCameraBestTargetId);
+    // SmartDashboard.putNumber("BestleftFrtCam Tgt Area", leftFrtCameraBestTargetArea);
   }
 
   //////////// rightFrt Camera Getter methods to access target data
   public boolean rightFrtCamTgtDectected() {
     return rightFrtCameraHasTargets;
+  }
+
+  public double getRightFrtCamNumOfTgts() {
+    return RightCamNumOfTgts;
   }
 
   public double getrightFrtCamBestTgtId() {
@@ -325,6 +383,10 @@ public class VisionSubsystem extends SubsystemBase {
     return leftFrtCameraHasTargets;
   }
 
+  public double getLeftFrtCamNumOfTgts() {
+    return LeftCamNumOfTgts;
+  }
+
   public double getleftFrtCamBestTgtId() {
     return leftFrtCameraBestTargetId;
   }
@@ -350,7 +412,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     for (var change : rightFrtCamera.getAllUnreadResults()) {
       visionEst = rightFrtCamPoseEstimator.update(change);
-      updateEstimationrightFrtCamStdDevs(visionEst, change.getTargets());
+      updateEstimationRightFrtCamStdDevs(visionEst, change.getTargets());
     }
     return visionEst;
   }
@@ -362,8 +424,9 @@ public class VisionSubsystem extends SubsystemBase {
    * @param estimatedPose The estimated pose to guess standard deviations for.
    * @param targets All targets in this camera frame
    */
-  private void updateEstimationrightFrtCamStdDevs(
+  private void updateEstimationRightFrtCamStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
       currightFrtCamStdDevs = kSingleTagStdDevs;
@@ -386,6 +449,8 @@ public class VisionSubsystem extends SubsystemBase {
                 .getTranslation()
                 .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
       }
+
+      RightCamNumOfTgts = numTags;
 
       if (numTags == 0) {
         // No tags visible. Default to single-tag std devs
@@ -418,7 +483,7 @@ public class VisionSubsystem extends SubsystemBase {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
     for (var change : leftFrtCamera.getAllUnreadResults()) {
       visionEst = leftFrtCamPoseEstimator.update(change);
-      updateEstimationleftFrtCamStdDevs(visionEst, change.getTargets());
+      updateEstimationLeftFrtCamStdDevs(visionEst, change.getTargets());
     }
     return visionEst;
   }
@@ -430,7 +495,7 @@ public class VisionSubsystem extends SubsystemBase {
    * @param estimatedPose The estimated pose to guess standard deviations for.
    * @param targets All targets in this camera frame
    */
-  private void updateEstimationleftFrtCamStdDevs(
+  private void updateEstimationLeftFrtCamStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
@@ -454,6 +519,8 @@ public class VisionSubsystem extends SubsystemBase {
                 .getTranslation()
                 .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
       }
+
+      LeftCamNumOfTgts = numTags;
 
       if (numTags == 0) {
         // No tags visible. Default to single-tag std devs

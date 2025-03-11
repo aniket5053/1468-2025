@@ -28,6 +28,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,11 +42,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -61,6 +64,9 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase {
   private static final double deadband = 0.10;
   final Joystick driverLeftJoystick = new Joystick(0);
+
+  double TgtID_SZ = 99.0;
+  double DesiredRotation = 0.0;
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
@@ -109,8 +115,19 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
+
+  private static final Matrix<N3, N1> stateSTDS =
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+  private static final Matrix<N3, N1> initialVisionSTDS = VecBuilder.fill(1, 1, 1);
+
   private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+      new SwerveDrivePoseEstimator(
+          kinematics,
+          rawGyroRotation,
+          lastModulePositions,
+          new Pose2d(),
+          stateSTDS,
+          initialVisionSTDS);
 
   public Drive(
       GyroIO gyroIO,
@@ -149,7 +166,7 @@ public class Drive extends SubsystemBase {
             // up to now I and D were zero Tried: 6.5, 0.000005, 0.00000005 - no difference
             // P = 6.5 seems good, now doing D, .5 too high,
 
-            new PIDConstants(3, 0.200, .1), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(9, 2.0, .5), new PIDConstants(7.0, 0.0, 0.0)),
         PP_CONFIG,
         // TA TODO: Turn off flipping for now!!!
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
@@ -180,6 +197,9 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    determineAprilTagToDriveTo_SZ();
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -452,5 +472,67 @@ public class Drive extends SubsystemBase {
     for (var module : modules) {
       module.setCoastMode();
     }
+  }
+
+  public void determineAprilTagToDriveTo_SZ() {
+    double TempX = getPose().getX();
+    double TempY = getPose().getY();
+    ////////////////////////////// blue reef /////////////////////////////////////////
+    if (TempX < 4.489323) {
+      if ((TempY - 6.61781184) > (-0.5773502686 * TempX)) {
+        TgtID_SZ = 19.0;
+        DesiredRotation = -60.0;
+      } else if ((TempY - 1.43398816) < (0.5773502686 * TempX)) {
+        TgtID_SZ = 17.0;
+        DesiredRotation = 60.0;
+      } else {
+        TgtID_SZ = 18.0;
+        DesiredRotation = 0.0;
+      }
+    } else if (TempX < 8.774) {
+      if ((TempY - 6.61781184) < (-0.5773502686 * TempX)) {
+        TgtID_SZ = 22.0;
+        DesiredRotation = 120.0;
+      } else if ((TempY - 1.43398816) > (0.5773502686 * TempX)) {
+        TgtID_SZ = 20.0;
+        DesiredRotation = -120.0;
+      } else {
+        TgtID_SZ = 21.0;
+        DesiredRotation = 180.0;
+      }
+      ////////////////////////////// red reef /////////////////////////////////////////
+    } else if (TempX < 13.058677) {
+      if ((TempY - 6.61781184) < (0.5773502686 * (TempX - 17.548))) {
+        TgtID_SZ = 11.0;
+        DesiredRotation = 60.0;
+      } else if ((TempY - 1.43398816) > (-0.5773502686 * (TempX - 17.548))) {
+        TgtID_SZ = 9.0;
+        DesiredRotation = -60.0;
+      } else {
+        TgtID_SZ = 10.0;
+        DesiredRotation = 0.0;
+      }
+    } else {
+      if ((TempY - 6.61781184) > (0.5773502686 * (TempX - 17.548))) {
+        TgtID_SZ = 8.0;
+        DesiredRotation = -120.0;
+      } else if ((TempY - 1.43398816) < (-0.5773502686 * (TempX - 17.548))) {
+        TgtID_SZ = 6.0;
+        DesiredRotation = 120.0;
+      } else {
+        TgtID_SZ = 7.0;
+        DesiredRotation = 180.0;
+      }
+    }
+
+    SmartDashboard.putNumber("Drive to Reef Position (SZ)", TgtID_SZ);
+  }
+
+  public double getDesiredRotation() {
+    return DesiredRotation;
+  }
+
+  public double getTrgtIdToDriveTo_SZ() {
+    return TgtID_SZ;
   }
 }

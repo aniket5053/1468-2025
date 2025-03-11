@@ -11,19 +11,17 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmAlgaeLow extends SequentialCommandGroup {
-  // Since Level 2 is low, start elbow and elevator movement, wrist last to insure it's free to move
-  public ArmAlgaeLow(ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist) {
+  // Since elevator is at 0, move wrist to position and then elbow into algae
+  public ArmAlgaeLow(
+      ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new MM_ElbowToPosition(
-                elbow, ElbowConstants.kAlgaeAngle, ElbowConstants.kToleranceDegrees),
+            new MM_ElevatorToPosition(elevator, ElevatorConstants.kAlgaeLowPos, tolerance),
             Commands.sequence(
-                new WaitCommand(0.05),
-                new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kAlgaeLowPos, ElevatorConstants.kToleranceInches)),
+                //           new WaitCommand(0.2),
+                new MM_WristToPosition(wrist, WristConstants.kAlgaeLowAngle, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.15),
-                new MM_WristToPosition(
-                    wrist, WristConstants.kAlgaeAngle, WristConstants.kToleranceDegrees))));
+                new WaitCommand(0.25),
+                new MM_ElbowToPosition(elbow, ElbowConstants.kAlgaeLowAngle, tolerance))));
   }
 }

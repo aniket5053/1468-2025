@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ConstantsMechanisms.ElbowConstants;
@@ -11,24 +12,22 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmHome extends SequentialCommandGroup {
-  // First start wrist to insure it wont get wedged into elevator,
-  // then lower elevator, so it's not sticking out too far, lastly, lower elbow angle
-  public ArmHome(ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist) {
+  // First start wrist and elevator to insure it wont get wedged into reef,
+  // then lower elevator, so it's not sticking out too far, and so not to get the wrist jammed
+  public ArmHome(
+      ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
+
     addCommands(
-        Commands.race(
-            new WaitCommand(0.5),
-            new MM_ElbowToPosition(
-                elbow, ElbowConstants.kPreHomeAngle, ElbowConstants.kToleranceDegrees)),
         Commands.parallel(
-            new MM_WristToPosition(
-                wrist, WristConstants.kHomeAngle, WristConstants.kToleranceDegrees),
+            new MM_WristToPosition(wrist, WristConstants.kHomeAngle, tolerance),
             Commands.sequence(
-                //                new WaitCommand(0.1),
-                new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kHomePos, ElevatorConstants.kToleranceInches)),
+                //              new WaitCommand(0.25),
+                new MM_ElbowToPosition(elbow, ElbowConstants.kHomeAngle, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.25),
-                new MM_ElbowToPosition(
-                    elbow, ElbowConstants.kHomeAngle, ElbowConstants.kToleranceDegrees))));
+                new WaitCommand(
+                    0.25), // TA TODO: Optimize delay - make sure not to hit reef - esp L4 and L3
+                // Force elevator command to finish so that we can reset 0 position
+                new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, .5),
+                new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator))));
   }
 }

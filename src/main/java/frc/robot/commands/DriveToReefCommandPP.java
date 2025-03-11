@@ -43,8 +43,9 @@ public class DriveToReefCommandPP extends Command {
   public void execute() {
 
     // Activate a path only if its a valid Reef April Tag ID detected
-    double TgtID = m_vision.getTrgtIdToDriveTo();
-    if (TgtID != 99.0) {
+    double TgtID_SZ = m_drive.getTrgtIdToDriveTo_SZ();
+    // double TgtID = m_vision.getTrgtIdToDriveTo();
+    if (TgtID_SZ != 99.0) {
 
       // The rotation component in these poses represents the direction of travel
       double TempX = m_drive.getPose().getX();
@@ -53,21 +54,32 @@ public class DriveToReefCommandPP extends Command {
       //      Pose2d startPt = m_drive.getPose();
       Pose2d startPt = new Pose2d(TempX, TempY, TempAngle);
 
-      DetermineEndPoint(TgtID, offset);
+      DetermineEndPoint(TgtID_SZ, offset);
+
+      // creates intermediate point for on-the-fly path that has the bumper 14 inches from the end
+      // point
+      double interPtX = (endPtX - (0.3556 * Math.cos(endPtHoloRotation * (Math.PI / 180))));
+      double interPtY = (endPtY - (0.3556 * Math.sin(endPtHoloRotation * (Math.PI / 180))));
+      Pose2d interPt = new Pose2d(interPtX, interPtY, Rotation2d.fromDegrees(endPtHoloRotation));
+
       Pose2d endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation)); // x,-y
 
-      List<Waypoint> wayPoints = PathPlannerPath.waypointsFromPoses(startPt, endPt);
+      List<Waypoint> wayPoints = PathPlannerPath.waypointsFromPoses(startPt, interPt, endPt);
       PathPlannerPath path =
           new PathPlannerPath(
               wayPoints,
               new PathConstraints(
-                  3.0,
-                  3.0, // was 4
+                  4.0,
+                  4.0, // was 3,3
                   // 3.0, 3.0,
-                  Units.degreesToRadians(360),
+                  Units.degreesToRadians(540), // was 360
                   Units.degreesToRadians(720)), // was 540
               null,
-              new GoalEndState(0.0, Rotation2d.fromDegrees(endPtHoloRotation)));
+              new GoalEndState(
+                  0.0,
+                  Rotation2d.fromDegrees(
+                      endPtHoloRotation))); // allows the robot to glide into the reef, 0.1 seems to
+      // not do much
 
       // Prevent this path from being flipped on the red alliance, since the given
       // positions are already correct
@@ -102,6 +114,203 @@ public class DriveToReefCommandPP extends Command {
   public void DetermineEndPoint(double Id, double offset) {
     switch ((int) Id) {
 
+        // new coordinates
+
+        ////////////////////////////// red reef /////////////////////////////////////////
+        /*    s/s coefficients
+          case 6:
+            if (offset == kLeftSide) {
+              endPtX = 13.55429891;
+              endPtY = 2.83923003;
+              endPtHoloRotation = 120.0;
+            } else if (offset == kRightSide) {
+              endPtX = 13.83894067;
+              endPtY = 3.00356803;
+              endPtHoloRotation = 120.0;
+            } else {
+              endPtX = 13.69661979;
+              endPtY = 2.92139903;
+              endPtHoloRotation = 120.0;
+            }
+            break;
+
+          case 7:
+            if (offset == kLeftSide) {
+              endPtX = 14.33428679;
+              endPtY = 3.86159132;
+              endPtHoloRotation = 180.0;
+            } else if (offset == kRightSide) {
+              endPtX = 14.33428679;
+              endPtY = 4.19026732;
+              endPtHoloRotation = 180.0;
+            } else {
+              endPtX = 14.33428679;
+              endPtY = 4.02592932;
+              endPtHoloRotation = 180.0;
+            }
+            break;
+
+          case 8:
+            if (offset == kLeftSide) {
+              endPtX = 13.83888988;
+              endPtY = 5.04826129;
+              endPtHoloRotation = -120.0;
+            } else if (offset == kRightSide) {
+              endPtX = 13.55424812;
+              endPtY = 5.21259929;
+              endPtHoloRotation = -120.0;
+            } else {
+              endPtX = 13.696569;
+              endPtY = 5.13043029;
+              endPtHoloRotation = -120.0;
+            }
+            break;
+
+          case 9:
+            if (offset == kLeftSide) {
+              endPtX = 12.56350509;
+              endPtY = 5.21256997;
+              endPtHoloRotation = -60.0;
+            } else if (offset == kRightSide) {
+              endPtX = 12.27886333;
+              endPtY = 5.04823197;
+              endPtHoloRotation = -60.0;
+            } else {
+              endPtX = 12.42118421;
+              endPtY = 5.13040097;
+              endPtHoloRotation = -60.0;
+            }
+            break;
+
+          case 10:
+            if (offset == kLeftSide) {
+              endPtX = 11.78351721;
+              endPtY = 4.19020868;
+              endPtHoloRotation = 0.0;
+            } else if (offset == kRightSide) {
+              endPtX = 11.78351721;
+              endPtY = 3.86153268;
+              endPtHoloRotation = 0.0;
+            } else {
+              endPtX = 11.78351721;
+              endPtY = 4.02587068;
+              endPtHoloRotation = 0.0;
+            }
+            break;
+
+          case 11:
+            if (offset == kLeftSide) {
+              endPtX = 12.27891412;
+              endPtY = 3.00353871;
+              endPtHoloRotation = 60.0;
+            } else if (offset == kRightSide) {
+              endPtX = 12.56355588;
+              endPtY = 2.83920071;
+              endPtHoloRotation = 60.0;
+            } else {
+              endPtX = 12.421235;
+              endPtY = 2.92136971;
+              endPtHoloRotation = 60.0;
+            }
+            break;
+
+            ////////////////////////////// blue reef -shift/////////////////////////////////////////
+          case 22:
+            if (offset == kLeftSide) {
+              endPtX = 13.55429891 - 8.569579;
+              endPtY = 2.83923003;
+              endPtHoloRotation = 120.0;
+            } else if (offset == kRightSide) {
+              endPtX = 13.83894067 - 8.569579;
+              endPtY = 3.00356803;
+              endPtHoloRotation = 120.0;
+            } else {
+              endPtX = 13.69661979 - 8.569579;
+              endPtY = 2.92139903;
+              endPtHoloRotation = 120.0;
+            }
+            break;
+
+          case 21:
+            if (offset == kLeftSide) {
+              endPtX = 14.33428679 - 8.569579;
+              endPtY = 3.86159132;
+              endPtHoloRotation = 180.0;
+            } else if (offset == kRightSide) {
+              endPtX = 14.33428679 - 8.569579;
+              endPtY = 4.19026732;
+              endPtHoloRotation = 180.0;
+            } else {
+              endPtX = 14.33428679 - 8.569579;
+              endPtY = 4.02592932;
+              endPtHoloRotation = 180.0;
+            }
+            break;
+
+          case 20:
+            if (offset == kLeftSide) {
+              endPtX = 13.83888988 - 8.569579;
+              endPtY = 5.04826129;
+              endPtHoloRotation = -120.0;
+            } else if (offset == kRightSide) {
+              endPtX = 13.55424812 - 8.569579;
+              endPtY = 5.21259929;
+              endPtHoloRotation = -120.0;
+            } else {
+              endPtX = 13.696569 - 8.569579;
+              endPtY = 5.13043029;
+              endPtHoloRotation = -120.0;
+            }
+            break;
+
+          case 19:
+            if (offset == kLeftSide) {
+              endPtX = 12.56350509 - 8.569579;
+              endPtY = 5.21256997;
+              endPtHoloRotation = -60.0;
+            } else if (offset == kRightSide) {
+              endPtX = 12.27886333 - 8.569579;
+              endPtY = 5.04823197;
+              endPtHoloRotation = -60.0;
+            } else {
+              endPtX = 12.42118421 - 8.569579;
+              endPtY = 5.13040097;
+              endPtHoloRotation = -60.0;
+            }
+            break;
+
+          case 18:
+            if (offset == kLeftSide) {
+              endPtX = 11.78351721 - 8.569579;
+              endPtY = 4.19020868;
+              endPtHoloRotation = 0.0;
+            } else if (offset == kRightSide) {
+              endPtX = 11.78351721 - 8.569579;
+              endPtY = 3.86153268;
+              endPtHoloRotation = 0.0;
+            } else {
+              endPtX = 11.78351721 - 8.569579;
+              endPtY = 4.02587068;
+              endPtHoloRotation = 0.0;
+            }
+            break;
+
+          case 17:
+            if (offset == kLeftSide) {
+              endPtX = 12.27891412 - 8.569579;
+              endPtY = 3.00353871;
+              endPtHoloRotation = 60.0;
+            } else if (offset == kRightSide) {
+              endPtX = 12.56355588 - 8.569579;
+              endPtY = 2.83920071;
+              endPtHoloRotation = 60.0;
+            } else {
+              endPtX = 12.421235 - 8.569579;
+              endPtY = 2.92136971;
+              endPtHoloRotation = 60.0;
+            }
+            break;
+        end of S/S coeffients */
         ////////////////////////////// red reef /////////////////////////////////////////
       case 6:
         if (offset == kLeftSide) {
@@ -282,8 +491,8 @@ public class DriveToReefCommandPP extends Command {
 
       case 22:
         if (offset == kLeftSide) {
-          endPtX = 5.000;
-          endPtY = 2.807;
+          endPtX = 4.982; // was 5.000;
+          endPtY = 2.800; // was 2.807;
           endPtHoloRotation = 120.0;
         } else if (offset == kRightSide) {
           endPtX = 5.286;
