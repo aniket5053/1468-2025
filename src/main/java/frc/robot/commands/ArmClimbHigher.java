@@ -10,20 +10,20 @@ import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
-public class ArmHomeWithAlgae extends SequentialCommandGroup {
-  // First start hold wrist still and move elbow back to not have algae get dislodged,
-  // then lower elevator
-  public ArmHomeWithAlgae(
+public class ArmClimbHigher extends SequentialCommandGroup {
+  // "UNclimb" command must be selected first, which will have elevator and wrist in correct
+  // position, but for safety reasons delay wrist
+  // so now just move elbow
+  public ArmClimbHigher(
       ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
-            new MM_WristToPosition(wrist, WristConstants.kHomeWithAlgaeAngle, tolerance),
-            Commands.sequence(
-                //                new WaitCommand(0.25),
-                new MM_ElbowToPosition(elbow, ElbowConstants.kHomeWithAlgae, tolerance)),
+            new MM_ElevatorToPosition(elevator, ElevatorConstants.kClimbPos, tolerance),
             Commands.sequence(
                 new WaitCommand(0.25),
-                new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kHomeWithAlgaePos, tolerance))));
+                new MM_WristToPosition(wrist, WristConstants.kClimbAngle, tolerance)),
+            Commands.sequence(
+                //                new WaitCommand(0.45),
+                new MM_ElbowToPosition(elbow, ElbowConstants.kClimbHigherAngle, tolerance))));
   }
 }

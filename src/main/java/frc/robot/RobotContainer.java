@@ -17,7 +17,6 @@ import static frc.robot.ConstantsMechanisms.*;
 import static frc.robot.ConstantsMechanisms.DriveConstants.*;
 import static frc.robot.ConstantsMechanisms.HandlerConstants.kHoldForever;
 
-import com.ctre.phoenix.led.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,11 +29,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.ConstantsMechanisms.ElbowConstants;
 import frc.robot.ConstantsMechanisms.ElevatorConstants;
+import frc.robot.ConstantsMechanisms.HandlerConstants;
 import frc.robot.ConstantsMechanisms.WristConstants;
 import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
@@ -63,7 +62,7 @@ public class RobotContainer {
   final WristSubsystem s_Wrist = new WristSubsystem();
   final HandlerSubsystem s_Handler = new HandlerSubsystem();
   final VisionSubsystem s_Vision = new VisionSubsystem();
-  final CANdleSubsystem m_candleSubsystem = new CANdleSubsystem(operatorJoystick);
+  final LEDSubsystem s_LED = new LEDSubsystem();
 
   // Dashboard inputs
   //  private final LoggedDashboardChooser<Command> autoChooser;
@@ -73,30 +72,35 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Register named commands for PathPlanner Auto Routines
+    // The drive commands are in the PathPlanner AutoRoutines only
+    // Add a few LED Commands for the driving
 
     // The following commands are for Left and Right Autos which try to score Coral
     // also for the Center Auto scoring of preloaded coral
-    NamedCommands.registerCommand(
-        "HoldHomePos", // Only use in race with a drive cmd
-        new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+    NamedCommands.registerCommand( // Only use in DEADLINE with a drive cmd as the DEADLINE
+        "HoldHomePos", // - poor name now since it goes to Pre4 -
+        // start arm home, once drivng forward get arm up
+        new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
+            .withTimeout(.1)
+            .andThen(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)));
 
     NamedCommands.registerCommand(
-        "ArmToL4", // Auto Tolerance so commands end when arm at correct position
-        //       new ArmPreLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)
-        //           .andThen
-        (new ArmLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
+        "ArmToL4", // Auto Tolerance so command ends when arm at correct position
+        new ArmLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto));
 
     NamedCommands.registerCommand(
         "Shoot",
-        Commands.race( // Hold arm still until shot complete, then move arm home
+        Commands.race( // Hold arm still until shot complete, then move arm down and end command
                 new HandlerShootCoralOut(s_Handler),
                 new ArmLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
             // Auto Tolerance so command ends when arm at correct position
-            .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
+            // .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
+            .andThen(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
 
     NamedCommands.registerCommand(
-        "HarvestCoral",
-        Commands.race( // Hold arm still until Coral harvested, then move arm home
+        "HarvestCoral", // Only use as the DEADLINE with a drive Cmd (this cmd ends when coral
+        // harvested)
+        Commands.race( // Hold arm still until Coral harvested, then end command
             new HandlerHarvestCoral(s_Handler),
             new ArmCoralStation(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)));
     //            .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
@@ -104,9 +108,11 @@ public class RobotContainer {
     // The following commands are for the Center Auto which trys to get and score algae
     // (after scoring intial preloaded coral)
     NamedCommands.registerCommand(
-        "HoldAlgaeHomePos", // Only use in race with a drive cmd
-        new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
-            .alongWith(new HandlerHarvestAlgae(s_Handler, kHoldForever)));
+        "HoldAlgaeHomePos", // Only use in race with a drive cmd - THIS COMMAND DOESNT FINISH
+        Commands.race(
+            new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
+            (new HandlerHarvestAlgae(s_Handler, kHoldForever))));
+
     NamedCommands.registerCommand(
         "GetAlgaeHigh",
         Commands.race( // Hold arm still until Algae harvested, then move arm home
@@ -128,11 +134,20 @@ public class RobotContainer {
                     new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
 
     NamedCommands.registerCommand(
+        "HoldAlgaePreBargePos", // Only use in race with a drive cmd - THIS COMMAND NEVER FINISHES
+        Commands.race(
+            new ArmPreAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
+            (new HandlerHarvestAlgae(s_Handler, kHoldForever))));
+
+    NamedCommands.registerCommand(
         "ShootAlgae",
-        Commands.race( // Hold Algae while Moving Home
+        Commands.race( // Move arm up to barge holding algae, then shoot, then home and end command
                 new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto),
                 new HandlerHarvestAlgae(s_Handler, kHoldForever))
-            .andThen(new HandlerShootAlgaeOut(s_Handler))
+            .andThen(
+                Commands.race(
+                    new HandlerShootAlgaeOut(s_Handler),
+                    new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)))
             .andThen(new ArmHomeAfterAlgaeShot(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
 
     switch (Constants.currentMode) {
@@ -177,7 +192,12 @@ public class RobotContainer {
     SmartDashboard.putData(s_Wrist);
     SmartDashboard.putData(s_Handler);
     SmartDashboard.putData(s_Vision);
-    SmartDashboard.putData(m_candleSubsystem);
+    SmartDashboard.putData(s_LED);
+
+    // Put Cage Selection binary buttons on SmartDashboard
+    SmartDashboard.putBoolean("LeftCage", false);
+    SmartDashboard.putBoolean("CenterCage", false);
+    SmartDashboard.putBoolean("RightCage", false);
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -211,102 +231,43 @@ public class RobotContainer {
 
     new JoystickButton(driverLeftJoystick, 1)
         .debounce(0.10)
-        .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, kLeftSide));
+        .onTrue(
+            new DriveToCoralStCommandPP(drive, s_Vision, kLeftSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
+
+    new JoystickButton(driverLeftJoystick, 3)
+        .debounce(0.10)
+        .onTrue(
+            new DriveToCageCommandPP(drive, kCenter)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
 
     /* Configuration Buttons
-        new JoystickButton(driverLeftJoystick, 2)
+        new JoystickButton(driverLeftJoystick, 4)
             .debounce(0.10)
             .onTrue(DriveCommands.feedforwardCharacterization(drive));
-        new JoystickButton(driverLeftJoystick, 3)
+        new JoystickButton(driverLeftJoystick, 5)
             .debounce(0.10)
             .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
     */
 
-    new JoystickButton(driverLeftJoystick, 3)
-        .debounce(0.10)
-        .onTrue(new DriveToCageCommandPP(drive, kCenter));
-    new JoystickButton(driverLeftJoystick, 4)
-        .debounce(0.10)
-        .onTrue(new DriveToCageCommandPP(drive, kLeftSide));
-    new JoystickButton(driverLeftJoystick, 5)
-        .debounce(0.10)
-        .onTrue(new DriveToCageCommandPP(drive, kRightSide));
-
     new JoystickButton(driverLeftJoystick, 6)
         .debounce(0.10)
-        .onTrue(new DriveToProcessorCommandPP(drive));
-    /*
-            // Lock to 0°
-        new POVButton(driverLeftJoystick, 0)
-            .whileTrue(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    () -> -driverLeftJoystick.getY(),
-                    () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(0.0)));
-                // Lock to 60°
-               new POVButton(driverLeftJoystick, 45)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(60.0)));
-               // Lock to 90°
-               new POVButton(driverLeftJoystick, 90)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(90.0)));
-               // Lock to 120°
-               new POVButton(driverLeftJoystick, 135)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(120.0)));
-               // Lock to 180°
-               new POVButton(driverLeftJoystick, 180)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(180.0)));
-               // Lock to -120°
-               new POVButton(driverLeftJoystick, 225)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(-120.0)));
-               // Lock to -90°
-               new POVButton(driverLeftJoystick, 270)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(-90.0)));
-               // Lock to -60°
-               new POVButton(driverLeftJoystick, 315)
-                   .whileTrue(
-                       DriveCommands.joystickDriveAtAngle(
-                           drive,
-                           () -> -driverLeftJoystick.getY(),
-                           () -> -driverLeftJoystick.getX(),
-                           () -> Rotation2d.fromDegrees(-60.0)));
-    */
+        .onTrue(
+            new DriveToProcessorCommandPP(drive)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
+
     // Driver Buttons - Right Joystick --------------------------------------------
 
     // Coral Station Right Side
     new JoystickButton(driverRightJoystick, 1)
         .debounce(0.10)
-        .onTrue(new DriveToCoralStCommandPP(drive, s_Vision, kRightSide));
+        .onTrue(
+            new DriveToCoralStCommandPP(drive, s_Vision, kRightSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
 
     // Drive with left joystick, rotate to angle facing reef
     new JoystickButton(driverRightJoystick, 2)
@@ -320,13 +281,22 @@ public class RobotContainer {
     // Center Lt, Rt Drive to Reef Commands
     new JoystickButton(driverRightJoystick, 3)
         .debounce(0.10)
-        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kCenter));
+        .onTrue(
+            new DriveToReefCommandPP(drive, s_Vision, kCenter)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
     new JoystickButton(driverRightJoystick, 4)
         .debounce(0.10)
-        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kLeftSide));
+        .onTrue(
+            new DriveToReefCommandPP(drive, s_Vision, kLeftSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
     new JoystickButton(driverRightJoystick, 5)
         .debounce(0.10)
-        .onTrue(new DriveToReefCommandPP(drive, s_Vision, kRightSide));
+        .onTrue(
+            new DriveToReefCommandPP(drive, s_Vision, kRightSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
 
     // Switch to X pattern
     new JoystickButton(driverRightJoystick, 6)
@@ -355,24 +325,34 @@ public class RobotContainer {
     // Operator - Left  Joystick - Test Functions---------------------------
     // Operator - Left  Joystick - Test Functions---------------------------
 
+    // Clear Harvestor button - eject!
     new JoystickButton(testOprJoystick, 1)
         .debounce(0.10)
-        .onTrue(new HandlerHarvestCoral(s_Handler));
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    s_Handler.setHandlerVoltageVelos(
+                        HandlerConstants.kHandlerCoralInSpeed,
+                        HandlerConstants.kHandlerCoralInSpeed)));
     new JoystickButton(testOprJoystick, 1)
         .debounce(0.10)
         .onFalse(new InstantCommand(() -> s_Handler.stop(), s_Handler));
 
-    // Home button, but shouldnt be necessary for operator to use - automatically go there
+    // Home button
     new JoystickButton(testOprJoystick, 2)
         .debounce(0.10)
         .onTrue(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
 
+    // 90 degree elbow and wrist - 0in elevator (straight up - good for lab setup)
     new JoystickButton(testOprJoystick, 3)
         .debounce(0.10)
         .onTrue(
             new MM_ElbowToPosition(s_Elbow, ElbowConstants.kStartAngle, kToleranceHold)
                 .alongWith(
-                    new MM_WristToPosition(s_Wrist, WristConstants.kStartAngle, kToleranceHold)));
+                    new MM_WristToPosition(s_Wrist, WristConstants.kHomeAngle, kToleranceHold))
+                .alongWith(
+                    new MM_ElevatorToPosition(
+                        s_Elevator, ElevatorConstants.kStartPos, kToleranceHold)));
 
     new JoystickButton(testOprJoystick, 4)
         .debounce(0.10)
@@ -386,24 +366,39 @@ public class RobotContainer {
         .onTrue(
             new MM_ElevatorToPosition(s_Elevator, ElevatorConstants.kLevel4Pos, kToleranceHold));
 
+    // new JoystickButton(testOprJoystick, 8)
+    //     .debounce(0.10)
+    //     .onTrue(new MM_WristToPosition(s_Wrist, WristConstants.kStartAngle, kToleranceHold));
+    // new JoystickButton(testOprJoystick, 9)
+    //     .debounce(0.10)
+    //     .onTrue(new MM_WristToPosition(s_Wrist, WristConstants.kZeroOffset, kToleranceHold));
+
+    // Test PreLevel4 button
     new JoystickButton(testOprJoystick, 8)
         .debounce(0.10)
-        .onTrue(new MM_WristToPosition(s_Wrist, WristConstants.kStartAngle, kToleranceHold));
+        .onTrue(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
+        .onFalse(new ArmLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+
+    // Harvest In / eject up!
     new JoystickButton(testOprJoystick, 9)
         .debounce(0.10)
-        .onTrue(new MM_WristToPosition(s_Wrist, WristConstants.kZeroOffset, kToleranceHold));
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    s_Handler.setHandlerVoltageVelos(
+                        HandlerConstants.kHandlerAlgaeInSpeed,
+                        HandlerConstants.kHandlerAlgaeInSpeed)));
+    new JoystickButton(testOprJoystick, 9)
+        .debounce(0.10)
+        .onFalse(new InstantCommand(() -> s_Handler.stop(), s_Handler));
 
     new JoystickButton(testOprJoystick, 10)
         .debounce(0.10)
-        .onTrue(
-            new MM_ElbowToPosition(s_Elbow, ElbowConstants.kUpSmallDegrees, kToleranceHold)
-                .alongWith(new RunCommand(() -> m_candleSubsystem.setGreen())));
+        .onTrue(new ArmClimbLower(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
 
     new JoystickButton(testOprJoystick, 11)
         .debounce(0.10)
-        .onTrue(
-            new MM_ElbowToPosition(s_Elbow, ElbowConstants.kDownSmallDegrees, kToleranceHold)
-                .alongWith(new RunCommand(() -> m_candleSubsystem.setWhite())));
+        .onTrue(new ArmClimbHigher(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
 
     // Operator - Right  Joystick - Real Functions---------------------------
     // Operator - Right  Joystick - Real Functions---------------------------
@@ -417,29 +412,33 @@ public class RobotContainer {
                 .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)));
 
     // move arm to coral station position, and harvest coral. Once harvested move arm to Home
-    // position
+    // position - signal coral harvested for 1 sec (using LED shoot Cmd)
     new JoystickButton(operatorJoystick, 2)
         .debounce(0.10)
         .onTrue(
             Commands.race(
                     new ArmCoralStation(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
                     new HandlerHarvestCoral(s_Handler))
-                .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
-                .alongWith(new RunCommand(() -> m_candleSubsystem.setWhite())));
+                .alongWith(s_LED.setOperatorCmdStarted())
+                .andThen(s_LED.setOperatorShootCmd())
+                .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)));
 
     // Reef Level 3,4,2,and 1 positions (L4 has a 2 step move)
     new JoystickButton(operatorJoystick, 3)
         .debounce(0.10)
         .onTrue(new ArmLevel3(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+
     new JoystickButton(operatorJoystick, 4)
         .debounce(0.10)
         .onTrue(new ArmLevel2(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+
     new JoystickButton(operatorJoystick, 5)
         //       .debounce(0.10)
         //       .onTrue(new ArmPreLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
         //   new JoystickButton(operatorJoystick, 5)
         .debounce(0.10)
-        .onFalse(new ArmLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+        .onTrue(new ArmLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+
     new JoystickButton(operatorJoystick, 6)
         .debounce(0.10)
         .onTrue(new ArmLevel1(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
@@ -448,6 +447,7 @@ public class RobotContainer {
     new JoystickButton(operatorJoystick, 7)
         .debounce(0.10)
         .onTrue(new ArmUnClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+
     new JoystickButton(operatorJoystick, 8)
         .debounce(0.10)
         .onTrue(new ArmPreClimb1(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
@@ -460,11 +460,12 @@ public class RobotContainer {
         .debounce(0.10)
         .onTrue(new ArmClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
 
+    // Arm Up to Net - holding algae
     new JoystickButton(operatorJoystick, 11)
         .debounce(0.10)
         .onTrue(
-            new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
-                .alongWith(new HandlerHarvestAlgae(s_Handler, kHoldForever)));
+            new HandlerHarvestAlgae(s_Handler, kHoldForever)
+                .alongWith(new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)));
 
     new JoystickButton(operatorJoystick, 12)
         .debounce(0.10)
@@ -475,28 +476,32 @@ public class RobotContainer {
     new POVButton(operatorJoystick, 0)
         .debounce(0.10)
         .onTrue(
-            Commands.race( // Hold arm still until Algae harvested, then move arm home
+            Commands
+                .race( // Move Arm to High Algae Position, and Hold arm still until Algae harvested,
+                    // then move arm home
                     new ArmAlgaeHigh(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
                     new HandlerHarvestAlgae(s_Handler, !kHoldForever))
                 .andThen(
-                    Commands.race( // Hold Algae while Moving Home
+                    Commands.parallel( // Hold Algae while Moving Home
                         new HandlerHarvestAlgae(s_Handler, kHoldForever),
                         new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
 
     new POVButton(operatorJoystick, 180)
         .debounce(0.10)
         .onTrue(
-            Commands.race( // Hold arm still until Algae harvested, then move arm home
+            Commands
+                .race( // Move Arm to Low Algae Position, and Hold arm still until Algae harvested,
+                    // then move arm home
                     new ArmAlgaeLow(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
                     new HandlerHarvestAlgae(s_Handler, !kHoldForever))
                 .andThen(
-                    Commands.race( // Hold Algae while Moving Home
+                    Commands.parallel( // Hold Algae while Moving Home
                         new HandlerHarvestAlgae(s_Handler, kHoldForever),
                         new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
 
     new POVButton(operatorJoystick, 90)
         .debounce(0.10)
-        .onTrue(
+        .onTrue( // move arm to processor position holding algae
             new ArmAlgaeProcessor(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
                 .alongWith(new HandlerHarvestAlgae(s_Handler, kHoldForever)));
 
@@ -508,30 +513,6 @@ public class RobotContainer {
     //                .andThen(new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
     //                .alongWith(new HandlerHarvestAlgae(s_Handler, kHoldForever)));
   }
-
-  ////////////////////////////////  CANdle test commands  //////////////////////////////
-  /*
-      new JoystickButton(operatorJoystick, 3)
-          .onTrue(new RunCommand(m_candleSubsystem::setColors, m_candleSubsystem));
-      new JoystickButton(operatorJoystick, 4)
-          .onTrue(new RunCommand(m_candleSubsystem::incrementAnimation, m_candleSubsystem));
-      new JoystickButton(operatorJoystick, 5)
-          .onTrue(new RunCommand(m_candleSubsystem::decrementAnimation, m_candleSubsystem));
-
-      new POVButton(operatorJoystick, Constants.MaxBrightnessAngle)
-          .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 1.0));
-      new POVButton(operatorJoystick, Constants.MidBrightnessAngle)
-          .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0.3));
-      new POVButton(operatorJoystick, Constants.ZeroBrightnessAngle)
-          .onTrue(new CANdleConfigCommands.ConfigBrightness(m_candleSubsystem, 0));
-      new POVButton(operatorJoystick, Constants.ChangeDirectionAngle)
-          .onTrue(new RunCommand(() -> m_candleSubsystem.toggleAnimDirection(), m_candleSubsystem));
-
-      new JoystickButton(operatorJoystick, 9)
-          .onTrue(new RunCommand(() -> m_candleSubsystem.clearAllAnims(), m_candleSubsystem));
-      new JoystickButton(operatorJoystick, 10)
-          .onTrue(new RunCommand(() -> m_candleSubsystem.toggle5VOverride(), m_candleSubsystem));
-  */
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

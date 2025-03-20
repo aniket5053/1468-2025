@@ -10,8 +10,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 import java.util.Optional;
@@ -33,62 +31,100 @@ public class VisionSubsystem extends SubsystemBase {
 
   // Original XYZ for Right Camera (12.8343, -9.9354, -11.039) - these numbers are slightly off
   // vector from what's in CAD but close - SZ
-  private final double rightX = 12.8439; // inch
-  private final double rightY = -9.9281;
-  private final double rightZ = -11.0344;
+  // private final double rightX = 12.8439; // inch
+  // private final double rightY = -9.9281;
+  // private final double rightZ = -11.0344;
 
-  // Original XYZ for Left Camera (12.8343, 9.9354, -11.039) - these numbers are slightly off vector
-  // from what's in CAD but close - SZ
-  private final double leftX = 12.8439; // inch
-  private final double leftY = 9.9281;
-  private final double leftZ = -11.0344;
+  // // Original XYZ for Left Camera (12.8343, 9.9354, -11.039) - these numbers are slightly off
+  // vector
+  // // from what's in CAD but close - SZ
+  // private final double leftX = 12.8439; // inch
+  // private final double leftY = 9.9281;
+  // private final double leftZ = -11.0344;
 
-  // Normal unit vector orthogonal to camera YZ plane/x-axis pointing towards center of robot
-  private final double leftNormalX = -0.9517; // inch
-  private final double leftNormalY = -0.1711;
-  private final double leftNormalZ = -0.255; // was +
+  // // Normal unit vector orthogonal to camera YZ plane/x-axis pointing towards center of robot
+  // private final double leftNormalX = -0.9517; // inch
+  // private final double leftNormalY = -0.1711;
+  // private final double leftNormalZ = -0.255; // was +
 
-  private final double rightNormalX = -0.9517; // inch
-  private final double rightNormalY = 0.1711;
-  private final double rightNormalZ = -0.255; // was +
-  // TA TODO: Must optimize - started with 3.0, did not reach reef, 2.5 was very inaccurate, but
-  // reached
-  private final double scalingFactor = 0; // was 2.75 to find camera focus position
+  // private final double rightNormalX = -0.9517; // inch
+  // private final double rightNormalY = 0.1711;
+  // private final double rightNormalZ = -0.255; // was +
+  // // TA TODO: Must optimize - started with 3.0, did not reach reef, 2.5 was very inaccurate, but
+  // // reached
+  // private final double scalingFactor = 0; // was 2.75 to find camera focus position
 
-  // Calculates new camera positions based on scaling factor
+  // // Calculates new camera positions based on scaling factor
 
-  private final double adjustedRightX = rightX + (scalingFactor * rightNormalX);
-  private final double adjustedRightY = rightY + (scalingFactor * rightNormalY);
-  private final double adjustedRightZ = rightZ + (scalingFactor * rightNormalZ);
+  // private final double adjustedRightX = rightX + (scalingFactor * rightNormalX);
+  // private final double adjustedRightY = rightY + (scalingFactor * rightNormalY);
+  // private final double adjustedRightZ = rightZ + (scalingFactor * rightNormalZ);
 
-  private final double adjustedLeftX = leftX + (scalingFactor * leftNormalX);
-  private final double adjustedLeftY = leftY + (scalingFactor * leftNormalY);
-  private final double adjustedLeftZ = leftZ + (scalingFactor * leftNormalZ);
+  // private final double adjustedLeftX = leftX + (scalingFactor * leftNormalX);
+  // private final double adjustedLeftY = leftY + (scalingFactor * leftNormalY);
+  // private final double adjustedLeftZ = leftZ + (scalingFactor * leftNormalZ);
 
-  private final Transform3d robotToRightFrtCamera =
+  private final double cameraOffsetX = 12.8439; // CAD looks correct
+  private final double cameraOffsetY =
+      9.2; // by measurement to camera focal plane - ruler measurement was 9.9425
+  private final double cameraOffsetZ =
+      11.0344; // by measurement to camera focal plane - ruler measurement
+
+  private final double rtCameraOffsetRoll = 6.1;
+  private final double rtCameraOffsetPitch = -14.3;
+  private final double rtCameraOffesetYaw = -7.45; // was 8.5 had about a 1.2 d error
+
+  private final double ltCameraOffsetRoll = -5.5;
+  private final double ltCameraOffsetPitch = -15.3;
+  private final double ltCameraOffesetYaw = +10.1; // was 8.5
+
+  public final Transform3d robotToRightFrtCamera =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(adjustedRightX), // verified correct, 12.8343
-              Units.inchesToMeters(adjustedRightY), // verified negative is correct
-              Units.inchesToMeters(adjustedRightZ)), // verified correct
+              Units.inchesToMeters(cameraOffsetX), // verified correct, 12.8343
+              Units.inchesToMeters(-cameraOffsetY), // verified negative is correct
+              Units.inchesToMeters(cameraOffsetZ)), // verified correct
           new Rotation3d(
-              Units.degreesToRadians(+5.0), // was -
+              Units.degreesToRadians(rtCameraOffsetRoll), // was -
               Units.degreesToRadians(
-                  -15.1), // verified negative is correct -20.1 // 3/1 update: HAVE NOT VERIFIED
+                  rtCameraOffsetPitch), // verified negative is correct -20.1 // 3/1 update: HAVE
+              // NOT VERIFIED
               // (but robot drives fine) -
               // SZ
-              Units.degreesToRadians(-7.5))); // verified negative is correct - was 10.5
+              Units.degreesToRadians(
+                  rtCameraOffesetYaw))); // verified negative is correct - was 10.5
 
-  private final Transform3d robotToLeftFrtCamera =
+  public final Transform3d robotToLeftFrtCamera =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(adjustedLeftX), // verified correct
-              Units.inchesToMeters(adjustedLeftY), // verified correct
-              Units.inchesToMeters(adjustedLeftZ)), // verified correct
+              Units.inchesToMeters(cameraOffsetX), // verified correct
+              Units.inchesToMeters(cameraOffsetY), // verified correct
+              Units.inchesToMeters(cameraOffsetZ)), // verified correct
           new Rotation3d(
-              Units.degreesToRadians(-5.0), // was -
-              Units.degreesToRadians(-15.1), // verified negative is correct  -15.1
-              Units.degreesToRadians(+7.5))); // verified positive is correct - was 10.5
+              Units.degreesToRadians(ltCameraOffsetRoll), // was -
+              Units.degreesToRadians(ltCameraOffsetPitch), // verified negative is correct
+              Units.degreesToRadians(ltCameraOffesetYaw))); // verified positive is correct - was
+
+  public final Transform3d rightcamtorobot =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(-cameraOffsetX),
+              Units.inchesToMeters(+cameraOffsetY),
+              Units.inchesToMeters(-cameraOffsetZ)), // was -
+          new Rotation3d(
+              Units.degreesToRadians(-rtCameraOffsetRoll),
+              Units.degreesToRadians(-rtCameraOffsetPitch),
+              Units.degreesToRadians(-rtCameraOffesetYaw)));
+  public final Transform3d leftcamtotobot =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(-cameraOffsetX),
+              Units.inchesToMeters(-cameraOffsetY),
+              Units.inchesToMeters(-cameraOffsetZ)), // was -
+          new Rotation3d(
+              Units.degreesToRadians(-ltCameraOffsetRoll),
+              Units.degreesToRadians(-ltCameraOffsetPitch),
+              Units.degreesToRadians(-ltCameraOffesetYaw)));
 
   // Old Camera setup //////////////////////////////////////////////////////
   /*
@@ -188,8 +224,8 @@ public class VisionSubsystem extends SubsystemBase {
   // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.025, 0.025,
   // .1);
   // <1, 1, 2> too slow - was .5,.5,1.0  - still a little slow and yaw mostly robot gyro
-  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.3, 0.3, .5);
-  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.3, 0.3, .5);
+  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
+  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
 
   @Override
   public void periodic() {
@@ -330,7 +366,7 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    determineAprilTagToDriveTo();
+    //    determineAprilTagToDriveTo();
 
     // Publish to SmartDashboard
 
@@ -543,49 +579,49 @@ public class VisionSubsystem extends SubsystemBase {
     return curleftFrtCamStdDevs;
   }
 
-  public void determineAprilTagToDriveTo() {
+  // public void determineAprilTagToDriveTo() {
 
-    TgtID = 99.0;
-    double leftCamBestId = 99.0;
-    double rightCamBestId = 99.0;
-    double leftCamBestIdArea = 0.0;
-    double rightCamBestIdArea = 0.0;
+  //   TgtID = 99.0;
+  //   double leftCamBestId = 99.0;
+  //   double rightCamBestId = 99.0;
+  //   double leftCamBestIdArea = 0.0;
+  //   double rightCamBestIdArea = 0.0;
 
-    if (rightFrtCamTgtDectected()
-        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
-        (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Red)
-                && (getrightFrtCamBestTgtId() >= 6)
-                && (getrightFrtCamBestTgtId() <= 11))
-            || (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Blue)
-                && (getrightFrtCamBestTgtId() >= 17)
-                && (getrightFrtCamBestTgtId() <= 22)))) {
+  //   if (rightFrtCamTgtDectected()
+  //       && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
+  //       (DriverStation.getAlliance().isPresent()
+  //               && (DriverStation.getAlliance().get() == Alliance.Red)
+  //               && (getrightFrtCamBestTgtId() >= 6)
+  //               && (getrightFrtCamBestTgtId() <= 11))
+  //           || (DriverStation.getAlliance().isPresent()
+  //               && (DriverStation.getAlliance().get() == Alliance.Blue)
+  //               && (getrightFrtCamBestTgtId() >= 17)
+  //               && (getrightFrtCamBestTgtId() <= 22)))) {
 
-      rightCamBestId = getrightFrtCamBestTgtId();
-      rightCamBestIdArea = getrightFrtCamBestTgtArea();
-    }
+  //     rightCamBestId = getrightFrtCamBestTgtId();
+  //     rightCamBestIdArea = getrightFrtCamBestTgtArea();
+  //   }
 
-    if (leftFrtCamTgtDectected()
-        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
-        (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Red)
-                && (getleftFrtCamBestTgtId() >= 6)
-                && (getleftFrtCamBestTgtId() <= 11))
-            || (DriverStation.getAlliance().isPresent()
-                && (DriverStation.getAlliance().get() == Alliance.Blue)
-                && (getleftFrtCamBestTgtId() >= 17)
-                && (getleftFrtCamBestTgtId() <= 22)))) {
+  //   if (leftFrtCamTgtDectected()
+  //       && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
+  //       (DriverStation.getAlliance().isPresent()
+  //               && (DriverStation.getAlliance().get() == Alliance.Red)
+  //               && (getleftFrtCamBestTgtId() >= 6)
+  //               && (getleftFrtCamBestTgtId() <= 11))
+  //           || (DriverStation.getAlliance().isPresent()
+  //               && (DriverStation.getAlliance().get() == Alliance.Blue)
+  //               && (getleftFrtCamBestTgtId() >= 17)
+  //               && (getleftFrtCamBestTgtId() <= 22)))) {
 
-      leftCamBestId = getleftFrtCamBestTgtId();
-      leftCamBestIdArea = getleftFrtCamBestTgtArea();
-    }
+  //     leftCamBestId = getleftFrtCamBestTgtId();
+  //     leftCamBestIdArea = getleftFrtCamBestTgtArea();
+  //   }
 
-    if (leftCamBestIdArea >= rightCamBestIdArea) TgtID = leftCamBestId;
-    else TgtID = rightCamBestId;
-  }
+  //   if (leftCamBestIdArea >= rightCamBestIdArea) TgtID = leftCamBestId;
+  //   else TgtID = rightCamBestId;
+  // }
 
-  public double getTrgtIdToDriveTo() {
-    return TgtID;
-  }
+  // public double getTrgtIdToDriveTo() {
+  //   return TgtID;
+  // }
 }

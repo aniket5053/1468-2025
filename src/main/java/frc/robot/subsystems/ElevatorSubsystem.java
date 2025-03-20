@@ -64,11 +64,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     // 4V, 20A smooth but too fast
     MotionMagicConfigs mm = cfg.MotionMagic;
     mm.withMotionMagicCruiseVelocity(
-            RotationsPerSecond.of(3.5)) // (mechanism) rotations per second cruise
+            RotationsPerSecond.of(5)) // (mechanism) rotations per second cruise was 3.5
         .withMotionMagicAcceleration(
-            RotationsPerSecondPerSecond.of(10)) // Take approximately 0.2 seconds to reach max vel
+            RotationsPerSecondPerSecond.of(20)) // Take approximately 0.2 seconds to reach max vel
         // Take approximately 0.2 seconds to reach max accel
-        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
+        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(0));
+    //   .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
 
     Slot0Configs slot0 = cfg.Slot0;
     slot0.kG = 0.05; // fight the gravity!

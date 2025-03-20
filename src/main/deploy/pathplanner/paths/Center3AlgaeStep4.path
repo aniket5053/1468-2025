@@ -3,35 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.991,
-        "y": 2.828
+        "x": 7.65,
+        "y": 5.4
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.697107373853763,
-        "y": 2.423491502812526
+        "x": 7.07047545364852,
+        "y": 5.349298171959242
       },
       "isLocked": false,
-      "linkedName": "LtStp1EndPt"
+      "linkedName": "CtrStp3EP"
     },
     {
       "anchor": {
-        "x": 1.56,
-        "y": 0.76
+        "x": 5.14,
+        "y": 5.152
       },
       "prevControl": {
-        "x": 1.8538926261462365,
-        "y": 1.1645084971874735
+        "x": 5.638097349045872,
+        "y": 5.195577871373829
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LtStp2EndPt"
+      "linkedName": "CtrStp4EP"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.9,
-      "rotationDegrees": 54.0
+      "waypointRelativePos": 0.746376811594204,
+      "rotationDegrees": -119.99999999999999
     }
   ],
   "constraintZones": [],
@@ -47,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 54.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import static frc.robot.ConstantsMechanisms.ElbowConstants.*;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElbowSubsystem;
 
@@ -28,7 +27,7 @@ public class MM_ElbowToPosition extends Command {
 
     // note that the left side is negative angles, right side positive
     currentPosition = -m_elbowSubsystem.getLtElbowPosition() * kEncoderRotation2Degrees;
-    SmartDashboard.putNumber("Current LFT Elbow Pos in INIT", currentPosition);
+    //   SmartDashboard.putNumber("Current LFT Elbow Pos in INIT", currentPosition);
 
     if (m_targetPositionDegrees == kUpSmallDegrees)
       m_targetPositionDegrees = currentPosition + kSmallMoveDegrees;
@@ -59,8 +58,8 @@ public class MM_ElbowToPosition extends Command {
     // Check if the motor is close enough to the target position
     // note if tolerance = 0.0 the command will never finish
     // return Math.abs(elbowSubsystem.getLtElbowPosition() - targetPositionRotations) < tolerance;
-    SmartDashboard.putNumber(
-        "Current LFT Elbow Pos in FIN", -m_elbowSubsystem.getLtElbowPosition());
+    // SmartDashboard.putNumber(
+    //     "Current LFT Elbow Pos in FIN", -m_elbowSubsystem.getLtElbowPosition());
 
     if (Math.abs(
             m_elbowSubsystem.getLtElbowPosition()

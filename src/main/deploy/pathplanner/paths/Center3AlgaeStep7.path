@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.165,
-        "y": 2.88
+        "x": 5.14,
+        "y": 2.899
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.165,
-        "y": 2.88
+        "x": 5.609846310392954,
+        "y": 3.0700100716628342
       },
       "isLocked": false,
       "linkedName": "CtrStp6EP"
     },
     {
       "anchor": {
-        "x": 7.7,
-        "y": 4.9
+        "x": 7.65,
+        "y": 4.6
       },
       "prevControl": {
-        "x": 6.969804908036106,
-        "y": 4.169804908036106
+        "x": 7.266977778440511,
+        "y": 4.27860619515673
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 119.99999999999999

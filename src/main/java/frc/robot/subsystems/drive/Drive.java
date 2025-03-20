@@ -68,6 +68,8 @@ public class Drive extends SubsystemBase {
   double TgtID_SZ = 99.0;
   double DesiredRotation = 0.0;
 
+  double cageLocation;
+
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -81,8 +83,8 @@ public class Drive extends SubsystemBase {
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = 74.088;
-  private static final double ROBOT_MOI = 6.883;
+  private static final double ROBOT_MASS_KG = 59.874; // updated 3/15 to match GUI constants - SZ
+  private static final double ROBOT_MOI = 5.048; // updated 3/15 to match GUI constants - SZ
   private static final double WHEEL_COF = 1.2;
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
@@ -534,5 +536,13 @@ public class Drive extends SubsystemBase {
 
   public double getTrgtIdToDriveTo_SZ() {
     return TgtID_SZ;
+  }
+
+  public double getCageLocation() {
+    return cageLocation;
+  }
+
+  public void setCageLocation(double location) {
+    cageLocation = location;
   }
 }

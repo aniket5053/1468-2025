@@ -1,6 +1,6 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+// import static edu.wpi.first.units.Units.*;
 
 /** Automatically generated file containing build version information. */
 public final class ConstantsMechanisms {
@@ -56,16 +56,21 @@ public final class ConstantsMechanisms {
     public static final double kLevel2Angle = 100.0;
     public static final double kLevel3Angle = 97.0;
     public static final double kPreLevel4Angle = 100.0;
+    public static final double kLevel4AngleAuto = 89.5;
     public static final double kLevel4Angle = 88.5;
     public static final double kAlgaeHighAngle = 85.0; // 88 was too straight up
     public static final double kAlgaeLowAngle = 85.0; // 88 was too straight up
     public static final double kCoralStationAngle = 139.0; // 138 was too high, 140 was too low
     public static final double kBargeNetAngle = 100.0;
+    public static final double kHomeWithAlgae = 100.0;
     public static final double kProcessorAngle = 135.0;
     public static final double kUnClimbAngle = 90.0;
     public static final double kPreClimbAngle1 = 135.0;
     public static final double kPreClimbAngle2 = 145;
-    public static final double kClimbAngle = 175.0; // 170 works real well trying to optimize still
+    public static final double kClimbAngle = 173.0; // 165 too low
+    public static final double kClimbDeltaAngle = 3.0;
+    public static final double kClimbHigherAngle = kClimbAngle + kClimbDeltaAngle;
+    public static final double kClimbLowerAngle = kClimbAngle - kClimbDeltaAngle;
 
     public static final double kLowerSoftLimit = 82;
     public static final double kUpperSoftLimit = 180;
@@ -104,7 +109,7 @@ public final class ConstantsMechanisms {
 
     public static final double kStartPos = 0.0;
     public static final double kHomePos = 0.0; // must be zero - reset encoders here
-    public static final double kHomeWithAlgaePos = 0.0; // must be zero - reset encoders here
+
     /******************************************************************************************* */
     // must be zero - reset encoders here
     /******************************************************************************************* */
@@ -115,14 +120,15 @@ public final class ConstantsMechanisms {
     public static final double kLevel1Pos = 0.0;
     public static final double kLevel2Pos = 0.0;
     public static final double kLevel3Pos = 13.0; // higher since elbow is now 100, wass 90
-    public static final double kPreLevel4Pos = 35.0; // was 22, too low
-    public static final double kLevel4Pos = 40.0;
+    public static final double kPreLevel4Pos = 20.0; // now using in autonomous only
+    public static final double kLevel4Pos = 41.0; // was 40
+    public static final double kHomeWithAlgaePos = 7.0; // was 0
     public static final double kAlgaeLowPos = 4.0; // was 0 too low
     public static final double kAlgaeHighPos = 18.0; //
-    public static final double kBargeNetPos =
-        40.0; // was 44 - but algae shoots high slow lower some
-    public static final double kProcessorPos = kHomeWithAlgaePos;
-    public static final double kClimbPos = 6.0;
+    public static final double kPreBargeNetPos = 20;
+    public static final double kBargeNetPos = 40.0; // was 44, algae shoots high so lower
+    public static final double kProcessorPos = 0.0;
+    public static final double kClimbPos = 4.5;
     public static final double kUnClimbPos = 6.0;
 
     public static double kReverseSoftLimit = 0;
@@ -157,7 +163,7 @@ public final class ConstantsMechanisms {
     public static final double kLevel1Angle = -45.0; // have to shoot out over climber
     public static final double kLevel2Angle = -50.0; // -45 was too high
     public static final double kLevel3Angle = -42.0;
-    public static final double kLevel4Angle = -75.0; //
+    public static final double kLevel4Angle = -73.0; //
     public static final double kAlgaeLowAngle = -45.0; // elevator at 0, so angle cant be higher
     public static final double kAlgaeHighAngle = -45.0; // was -35 - too low
     public static final double kCoralStationAngle = -90.0; // working this angle -65 was too
@@ -184,8 +190,7 @@ public final class ConstantsMechanisms {
 
     public static final double kHandlerCoralInSpeed =
         0.10; // was .15, but too fast - coral went too far
-    public static final double kHandlerCoralOutSpeed =
-        0.10; // was .15, but too fast - coral bounced back
+    public static final double kHandlerCoralOutSpeed = 0.15; // 0.20 too fast
     public static final double kHandlerAlgaeInSpeed = -.15;
     public static final double kHandlerAlgaeOutSpeed = 0.75;
     public static final double kDesiredRotationsPerSecond = 100.0;

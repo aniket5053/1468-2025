@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ConstantsMechanisms.ElbowConstants;
@@ -27,7 +26,7 @@ public class ArmHome extends SequentialCommandGroup {
                 new WaitCommand(
                     0.25), // TA TODO: Optimize delay - make sure not to hit reef - esp L4 and L3
                 // Force elevator command to finish so that we can reset 0 position
-                new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, .5),
-                new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator))));
+                new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, tolerance))));
+    //          new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator))));
   }
 }

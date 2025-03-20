@@ -10,7 +10,8 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -38,42 +39,34 @@ public class DriveToCoralStCommandPP extends Command {
 
   @Override
   public void execute() {
-    //      Rear Camera Code - removed, now have 2 front cameras
-    // Activate a path only if its a valid Reef April Tag ID detected
-    //    if (m_vision.rearCamTgtDectected()
-    //        && ( // red reef april tags are numbers 6 - 11, blue are 17 - 22
-    //        (DriverStation.getAlliance().isPresent()
-    //                && (DriverStation.getAlliance().get() == Alliance.Red)
-    //                && (m_vision.getRearCamBestTgtId() >= 1)
-    //                && (m_vision.getRearCamBestTgtId() <= 2))
-    //            || (DriverStation.getAlliance().isPresent()
-    //                && (DriverStation.getAlliance().get() == Alliance.Blue)
-    //                && (m_vision.getRearCamBestTgtId() >= 12)
-    //                && (m_vision.getRearCamBestTgtId() <= 13)))) {
-    //      Rear Camera Code - removed, now have 2 front cameras
 
     // The rotation component in these poses represents the direction of travel
-    double TempX = m_drive.getPose().getX();
-    double TempY = m_drive.getPose().getY();
-    Rotation2d TempAngle = Rotation2d.fromDegrees(180.0 + endPtHoloRotation);
-    //      Pose2d startPt = m_drive.getPose();
-    Pose2d startPt = new Pose2d(TempX, TempY, TempAngle);
+    Pose2d startPt = m_drive.getPose();
+    double startX = m_drive.getPose().getX();
+    double startY = m_drive.getPose().getY();
     double TgtID = 0.0;
-    if (TempX < 8.0) { // Blue Side
-      if (TempY < 4.0) {
+
+    if (DriverStation.getAlliance().isPresent()
+        && (DriverStation.getAlliance().get() == Alliance.Blue)
+        && (startX < 6.0)) {
+
+      if (startY < 4.0) {
         TgtID = 12.0;
       } else {
         TgtID = 13.0;
       }
-    } else { // Red Side
-      if (TempY < 4.0) {
+
+      // For safety - Only allow button push if close to Barge in both x and y
+    } else if (DriverStation.getAlliance().isPresent()
+        && (DriverStation.getAlliance().get() == Alliance.Red)
+        && (startX > 13.0)) {
+
+      if (startY < 4.0) {
         TgtID = 1.0;
       } else {
         TgtID = 2.0;
       }
-    }
-
-    //      double TgtID = m_vision.getRearCamBestTgtId();
+    } else TgtID = 99; // dont auto drive, bad startPt (99 will cause 0 length path)
 
     DetermineEndPoint(TgtID, offset);
     // since driving backwards, the direction of travel is 180 + rotation
@@ -85,8 +78,8 @@ public class DriveToCoralStCommandPP extends Command {
         new PathPlannerPath(
             wayPoints,
             new PathConstraints(
-                4.0,
-                4.0, // was 4
+                3.0,
+                3.0, // was 4
                 // 3.0, 3.0,
                 Units.degreesToRadians(540),
                 Units.degreesToRadians(720)), // was 540
@@ -111,7 +104,7 @@ public class DriveToCoralStCommandPP extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.putString("DriveToTag Status", "NOT ACTIVE");
+    //  SmartDashboard.putString("DriveToTag Status", "NOT ACTIVE");
     m_drive.stop();
   }
 
@@ -127,15 +120,15 @@ public class DriveToCoralStCommandPP extends Command {
     switch ((int) Id) {
         // red Coral Stations
       case 1:
-        if (offset == kLeftSide) {
-          endPtX = 16.852;
-          endPtY = 1.360;
+        if (offset == kRightSide) {
+          endPtX = 16.75;
+          endPtY = 1.33;
           endPtHoloRotation = 126.0;
-        } else if (offset == kRightSide) {
-          endPtX = 15.941;
-          endPtY = 0.700;
+        } else if (offset == kLeftSide) {
+          endPtX = 15.95;
+          endPtY = 0.76;
           endPtHoloRotation = 126.0;
-        } else {
+        } else { // not used
           endPtX = 16.413;
           endPtY = 1.039;
           endPtHoloRotation = 126.0;
@@ -143,15 +136,15 @@ public class DriveToCoralStCommandPP extends Command {
         break;
 
       case 2:
-        if (offset == kLeftSide) {
-          endPtX = 15.941;
-          endPtY = 7.330;
+        if (offset == kRightSide) {
+          endPtX = 15.99;
+          endPtY = 7.29;
           endPtHoloRotation = -126.0;
-        } else if (offset == kRightSide) {
-          endPtX = 16.852;
-          endPtY = 6.666;
+        } else if (offset == kLeftSide) {
+          endPtX = 16.8;
+          endPtY = 6.7;
           endPtHoloRotation = -126.0;
-        } else {
+        } else { // not used
           endPtX = 16.380;
           endPtY = 7.010;
           endPtHoloRotation = -126.0;
@@ -159,15 +152,15 @@ public class DriveToCoralStCommandPP extends Command {
         break;
         // blue Coral Station
       case 12:
-        if (offset == kLeftSide) {
-          endPtX = 1.590;
-          endPtY = 0.710;
+        if (offset == kRightSide) {
+          endPtX = 1.560;
+          endPtY = 0.760;
           endPtHoloRotation = 54.0;
-        } else if (offset == kRightSide) {
-          endPtX = 0.700;
-          endPtY = 1.358;
+        } else if (offset == kLeftSide) {
+          endPtX = 0.75;
+          endPtY = 1.350;
           endPtHoloRotation = 54.0;
-        } else {
+        } else { // not used
           endPtX = 1.150;
           endPtY = 1.030;
           endPtHoloRotation = 54.0;
@@ -175,15 +168,15 @@ public class DriveToCoralStCommandPP extends Command {
         break;
 
       case 13:
-        if (offset == kLeftSide) {
-          endPtX = 0.690;
-          endPtY = 6.660;
+        if (offset == kRightSide) {
+          endPtX = 0.800;
+          endPtY = 6.720;
           endPtHoloRotation = -54.0;
-        } else if (offset == kRightSide) {
-          endPtX = 1.645;
-          endPtY = 7.356;
+        } else if (offset == kLeftSide) {
+          endPtX = 1.600;
+          endPtY = 7.290;
           endPtHoloRotation = -54.0;
-        } else {
+        } else { // not used
           endPtX = 1.183;
           endPtY = 7.020;
           endPtHoloRotation = -54.0;

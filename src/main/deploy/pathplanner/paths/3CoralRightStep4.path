@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.975,
-        "y": 5.244
+        "x": 3.703,
+        "y": 5.059
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4750000000000005,
-        "y": 6.110025403784438
+        "x": 3.349446609406726,
+        "y": 5.412553390593274
       },
       "isLocked": false,
       "linkedName": "RtStp3EP"
     },
     {
       "anchor": {
-        "x": 1.645,
-        "y": 7.356
+        "x": 1.6,
+        "y": 7.29
       },
       "prevControl": {
-        "x": 2.232785252292473,
-        "y": 6.546983005625052
+        "x": 1.9535533905932743,
+        "y": 6.936446609406726
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": -54.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.99999999999999

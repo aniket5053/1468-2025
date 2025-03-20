@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.002,
-        "y": 5.244
+        "x": 4.991,
+        "y": 5.224
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.502,
-        "y": 6.110025403784438
+        "x": 4.697107373853763,
+        "y": 5.628508497187474
       },
       "isLocked": false,
       "linkedName": "RtStp1EP"
     },
     {
       "anchor": {
-        "x": 1.645,
-        "y": 7.356
+        "x": 1.6,
+        "y": 7.29
       },
       "prevControl": {
-        "x": 2.232785252292473,
-        "y": 6.546983005625052
+        "x": 1.8938926261462365,
+        "y": 6.885491502812526
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "RtStp2EP"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9,
+      "rotationDegrees": -54.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -45,7 +50,7 @@
     "rotation": -54.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.99999999999999

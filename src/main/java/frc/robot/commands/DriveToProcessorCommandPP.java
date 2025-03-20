@@ -35,21 +35,25 @@ public class DriveToProcessorCommandPP extends Command {
 
     // The rotation component in these poses represents the direction of travel
     Pose2d startPt = m_drive.getPose();
+    double startY = m_drive.getPose().getY();
     Pose2d endPt;
     if (DriverStation.getAlliance().isPresent()
-        && (DriverStation.getAlliance().get() == Alliance.Red)) {
+        && (DriverStation.getAlliance().get() == Alliance.Red)
+        && startY > 4.5) {
       //  Real Coordinates
-      //     endPtX = 11.561;
-      //     endPtY = 7.485;
-      //     endPtHoloRotation = 90.0;
-      endPtX = 15.0;
-      endPtY = 6;
-      endPtHoloRotation = -90.0;
+      endPtX = 11.561;
+      endPtY = 7.050;
+      endPtHoloRotation = 90.0;
+      // test Coef
+      // endPtX = 15.0;
+      // endPtY = 6;
+      // endPtHoloRotation = -90.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else if (DriverStation.getAlliance().isPresent()
-        && (DriverStation.getAlliance().get() == Alliance.Blue)) {
+        && (DriverStation.getAlliance().get() == Alliance.Blue)
+        && (startY < 3.5)) {
       endPtX = 5.988;
-      endPtY = 0.572;
+      endPtY = 1.0;
       endPtHoloRotation = -90.0;
       endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
     } else {
@@ -61,8 +65,8 @@ public class DriveToProcessorCommandPP extends Command {
         new PathPlannerPath(
             wayPoints,
             new PathConstraints(
-                4.0,
-                4.0,
+                3.0,
+                3.0,
                 // 3.0, 3.0,      4.0s seem to work better
                 Units.degreesToRadians(540),
                 Units.degreesToRadians(720)),

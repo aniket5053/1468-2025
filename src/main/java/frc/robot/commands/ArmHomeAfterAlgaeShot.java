@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ConstantsMechanisms.ElbowConstants;
@@ -20,10 +19,7 @@ public class ArmHomeAfterAlgaeShot extends SequentialCommandGroup {
     addCommands(
         Commands.parallel(
             new MM_WristToPosition(wrist, WristConstants.kHomeAngle, tolerance),
-            // Force elevator command to finish so that we can reset 0 position
-            Commands.sequence(
-                new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, .5),
-                new InstantCommand(() -> elevator.setElevatorPosition(0.0), elevator)),
+            new MM_ElevatorToPosition(elevator, ElevatorConstants.kHomePos, .5),
             Commands.sequence(
                 new WaitCommand(0.25),
                 new MM_ElbowToPosition(elbow, ElbowConstants.kHomeAngle, tolerance))));

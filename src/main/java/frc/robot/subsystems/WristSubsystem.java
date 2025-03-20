@@ -65,7 +65,8 @@ public class WristSubsystem extends SubsystemBase {
         .withMotionMagicAcceleration(
             RotationsPerSecondPerSecond.of(20)) // Take approximately 0.2 seconds to reach max vel
         // Take approximately 0.2 seconds to reach max accel
-        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
+        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(0));
+    //    .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
 
     Slot0Configs slot0 = cfg.Slot0;
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction

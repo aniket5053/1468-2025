@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.59,
-        "y": 0.71
+        "x": 1.56,
+        "y": 0.76
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1491929034707464,
-        "y": 1.5390375725550416
+        "x": 2.2671067811865475,
+        "y": 1.4671067811865475
       },
       "isLocked": false,
       "linkedName": "LtStp2EndPt"
     },
     {
       "anchor": {
-        "x": 3.974,
-        "y": 2.806
+        "x": 3.703,
+        "y": 2.993
       },
       "prevControl": {
-        "x": 3.474,
-        "y": 1.9399745962155617
+        "x": 3.3494466094067263,
+        "y": 2.639446609406726
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 54.0

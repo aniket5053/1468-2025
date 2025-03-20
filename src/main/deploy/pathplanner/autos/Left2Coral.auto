@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3CoralRightStep1"
+                  "pathName": "2CoralRightStep1"
                 }
               },
               {
@@ -48,7 +48,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3CoralRightStep2"
+                  "pathName": "2CoralRightStep2"
                 }
               }
             ]
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3CoralRightStep3"
+                  "pathName": "2CoralRightStep3"
                 }
               },
               {
@@ -98,57 +98,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3CoralRightStep4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "3CoralRightStep5"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "HoldHomePos"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "HarvestCoral"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "3CoralRightStep6"
+                  "pathName": "2CoralRightStep4"
                 }
               }
             ]

@@ -74,11 +74,13 @@ public class ElbowSubsystem extends SubsystemBase {
     // 1V, 5A worked but too fast
     MotionMagicConfigs mm = cfg.MotionMagic;
     mm.withMotionMagicCruiseVelocity(
-            RotationsPerSecond.of(0.75)) // (mechanism) rotations per second cruise
+            RotationsPerSecond.of(1.25)) // was 1.0, TA TODO: optimize for movement and climbing
         .withMotionMagicAcceleration(
-            RotationsPerSecondPerSecond.of(2.25)) // Take approximately 0.2 seconds to reach max vel
+            RotationsPerSecondPerSecond.of(
+                2)) // Take approximately 0.5 seconds to reach max vel (was 2.25)
         // Take approximately 0.2 seconds to reach max accel
-        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(200));
+        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(0)); // was 200
+    //    .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(400)); // was 200
 
     Slot0Configs slot0 = cfg.Slot0;
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
@@ -196,7 +198,8 @@ public class ElbowSubsystem extends SubsystemBase {
 
   /* Set Elbow motor Position*/
   public double getLtElbowPosition() {
-    SmartDashboard.putNumber("Elbow LtMtr Angle in GET", currentLeftPos * kEncoderRotation2Degrees);
+    //  SmartDashboard.putNumber("Elbow LtMtr Angle in GET", currentLeftPos *
+    // kEncoderRotation2Degrees);
     return currentLeftPos;
   }
 

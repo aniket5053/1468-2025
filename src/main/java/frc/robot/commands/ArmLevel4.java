@@ -11,7 +11,6 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 public class ArmLevel4 extends SequentialCommandGroup {
-  // Since Level 4 is high, there is a ArmPreLevel4 command that raises elevator and elbow angle
   // start elevator to get above reef, then move elbow and wrist
   public ArmLevel4(
       ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
@@ -19,10 +18,10 @@ public class ArmLevel4 extends SequentialCommandGroup {
         Commands.parallel(
             new MM_ElevatorToPosition(elevator, ElevatorConstants.kLevel4Pos, tolerance),
             Commands.sequence(
-                new WaitCommand(0.4), // TA TODO: Optimize delay - make sure not to hit reef
+                new WaitCommand(0.10), // TA TODO: Optimize delay - make sure not to hit reef
                 new MM_ElbowToPosition(elbow, ElbowConstants.kLevel4Angle, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.40), // TA TODO: Optimize delay - make sure not to hit reef
+                new WaitCommand(0.75), // TA TODO: Optimize delay - make sure not to hit reef
                 new MM_WristToPosition(wrist, WristConstants.kLevel4Angle, tolerance))));
   }
 }

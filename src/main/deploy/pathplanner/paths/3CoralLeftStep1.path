@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.556,
-        "y": 0.85
+        "x": 7.1,
+        "y": 2.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.37423069638535,
-        "y": 1.058377813200316
+        "x": 6.646846106481675,
+        "y": 2.2613091308703495
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LtStp1StPt"
     },
     {
       "anchor": {
-        "x": 4.998120591385912,
-        "y": 2.8168190388830716
+        "x": 4.991,
+        "y": 2.828
       },
       "prevControl": {
-        "x": 5.748120591385912,
-        "y": 1.5177809332064136
+        "x": 5.444153893518325,
+        "y": 2.61669086912965
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 120.01243802894311
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 119.99999999999999
