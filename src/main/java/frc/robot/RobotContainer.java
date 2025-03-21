@@ -110,7 +110,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "HoldAlgaeHomePos", // Only use in race with a drive cmd - THIS COMMAND DOESNT FINISH
         Commands.race(
-            new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
+            new ArmHomeAfterAlgaeShotAuto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold),
             (new HandlerHarvestAlgae(s_Handler, kHoldForever))));
 
     NamedCommands.registerCommand(
@@ -121,7 +121,7 @@ public class RobotContainer {
             .andThen(
                 Commands.race( // Hold Algae while Moving Home
                     new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                    new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
+                    new ArmHomeFromAlgaeHigh(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
 
     NamedCommands.registerCommand(
         "GetAlgaeLow",
@@ -131,7 +131,7 @@ public class RobotContainer {
             .andThen(
                 Commands.race( // Hold Algae while Moving Home
                     new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                    new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
+                    new ArmHomeFromAlgaeLow(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
 
     NamedCommands.registerCommand(
         "HoldAlgaePreBargePos", // Only use in race with a drive cmd - THIS COMMAND NEVER FINISHES
@@ -148,7 +148,7 @@ public class RobotContainer {
                 Commands.race(
                     new HandlerShootAlgaeOut(s_Handler),
                     new ArmAlgaeBargeNet(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)))
-            .andThen(new ArmHomeAfterAlgaeShot(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
+            .andThen(new ArmHomeAfterAlgaeShotAuto(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
 
     switch (Constants.currentMode) {
       case REAL:
@@ -236,7 +236,8 @@ public class RobotContainer {
                 .alongWith(s_LED.setDriveCmdStarted())
                 .andThen(s_LED.setDriveCmdFinished()));
 
-    new JoystickButton(driverLeftJoystick, 3)
+    new POVButton(driverLeftJoystick, 0)
+        //   new JoystickButton(driverLeftJoystick, 3)
         .debounce(0.10)
         .onTrue(
             new DriveToCageCommandPP(drive, kCenter)
@@ -484,7 +485,7 @@ public class RobotContainer {
                 .andThen(
                     Commands.parallel( // Hold Algae while Moving Home
                         new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                        new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
+                        new ArmHomeFromAlgaeHigh(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
 
     new POVButton(operatorJoystick, 180)
         .debounce(0.10)
@@ -497,7 +498,7 @@ public class RobotContainer {
                 .andThen(
                     Commands.parallel( // Hold Algae while Moving Home
                         new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                        new ArmHomeWithAlgae(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
+                        new ArmHomeFromAlgaeLow(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))));
 
     new POVButton(operatorJoystick, 90)
         .debounce(0.10)

@@ -121,12 +121,12 @@ public class DriveToCoralStCommandPP extends Command {
         // red Coral Stations
       case 1:
         if (offset == kRightSide) {
-          endPtX = 16.75;
-          endPtY = 1.33;
+          endPtX = 16.788; // fixed
+          endPtY = 1.278;
           endPtHoloRotation = 126.0;
         } else if (offset == kLeftSide) {
-          endPtX = 15.95;
-          endPtY = 0.76;
+          endPtX = 15.998; // fixed
+          endPtY = 0.712;
           endPtHoloRotation = 126.0;
         } else { // not used
           endPtX = 16.413;
@@ -137,12 +137,12 @@ public class DriveToCoralStCommandPP extends Command {
 
       case 2:
         if (offset == kRightSide) {
-          endPtX = 15.99;
-          endPtY = 7.29;
+          endPtX = 15.973;
+          endPtY = 7.343; // fixed
           endPtHoloRotation = -126.0;
         } else if (offset == kLeftSide) {
-          endPtX = 16.8;
-          endPtY = 6.7;
+          endPtX = 16.82; // fixed
+          endPtY = 6.732;
           endPtHoloRotation = -126.0;
         } else { // not used
           endPtX = 16.380;
@@ -152,13 +152,13 @@ public class DriveToCoralStCommandPP extends Command {
         break;
         // blue Coral Station
       case 12:
-        if (offset == kRightSide) {
-          endPtX = 1.560;
-          endPtY = 0.760;
+        if (offset == kRightSide) { // fixed
+          endPtX = 1.533;
+          endPtY = 0.709;
           endPtHoloRotation = 54.0;
         } else if (offset == kLeftSide) {
-          endPtX = 0.75;
-          endPtY = 1.350;
+          endPtX = 0.742; // fixed
+          endPtY = 1.283;
           endPtHoloRotation = 54.0;
         } else { // not used
           endPtX = 1.150;
@@ -169,12 +169,12 @@ public class DriveToCoralStCommandPP extends Command {
 
       case 13:
         if (offset == kRightSide) {
-          endPtX = 0.800;
-          endPtY = 6.720;
+          endPtX = 0.719; // fixed
+          endPtY = 6.718;
           endPtHoloRotation = -54.0;
         } else if (offset == kLeftSide) {
-          endPtX = 1.600;
-          endPtY = 7.290;
+          endPtX = 1.500; // fixed
+          endPtY = 7.294;
           endPtHoloRotation = -54.0;
         } else { // not used
           endPtX = 1.183;

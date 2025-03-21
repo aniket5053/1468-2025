@@ -40,24 +40,18 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Center3AlgaeStep2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "GetAlgaeLow"
                 }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Center3AlgaeStep2"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "GetAlgaeLow"
           }
         },
         {
@@ -136,7 +130,7 @@
           }
         },
         {
-          "type": "race",
+          "type": "deadline",
           "data": {
             "commands": [
               {
@@ -148,47 +142,10 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "HoldAlgaeHomePos"
+                  "name": "HarvestCoral"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "GetAlgaeHigh"
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Center3AlgaeStep7"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "HoldAlgaeHomePos"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootAlgae"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "HoldAlgaeHomePos"
           }
         }
       ]

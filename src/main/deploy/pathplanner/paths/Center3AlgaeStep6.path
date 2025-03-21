@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.65,
-        "y": 5.152
+        "x": 7.6506,
+        "y": 5.35
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.0072123903134615,
-        "y": 4.385955556881022
+        "x": 7.180753689607045,
+        "y": 5.521010071662834
       },
       "isLocked": false,
       "linkedName": "CtrStp5EP"
     },
     {
       "anchor": {
-        "x": 5.14,
-        "y": 2.899
+        "x": 5.5,
+        "y": 6.5
       },
       "prevControl": {
-        "x": 5.39,
-        "y": 2.465987298107781
+        "x": 5.899369363834011,
+        "y": 6.354641439086591
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 126.0
   },
   "reversed": false,
   "folder": "3Coral",

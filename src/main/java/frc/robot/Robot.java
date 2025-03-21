@@ -287,7 +287,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("Aligned", isAligned); // TA TODO: Need to get a working Align LS
 
     boolean cageCaptured = CageLimitSwitch.get();
-    if (!cageCaptured) robotContainer.s_LED.setWhiteBlinking();
+    //   if (!cageCaptured) robotContainer.s_LED.setWhiteBlinking();
     SmartDashboard.putBoolean("CageCaptured", cageCaptured);
   }
 

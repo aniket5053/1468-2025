@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ConstantsMechanisms.ElbowConstants;
 import frc.robot.ConstantsMechanisms.ElevatorConstants;
 import frc.robot.ConstantsMechanisms.WristConstants;
@@ -10,10 +9,10 @@ import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
-public class ArmHomeWithAlgae extends SequentialCommandGroup {
+public class ArmHomeFromAlgaeHigh extends SequentialCommandGroup {
   // First start hold wrist still and move elbow back to not have algae get dislodged,
-  // then lower elevator
-  public ArmHomeWithAlgae(
+  // then maintain elevator high height
+  public ArmHomeFromAlgaeHigh(
       ElevatorSubsystem elevator, ElbowSubsystem elbow, WristSubsystem wrist, double tolerance) {
     addCommands(
         Commands.parallel(
@@ -22,8 +21,8 @@ public class ArmHomeWithAlgae extends SequentialCommandGroup {
                 //                new WaitCommand(0.25),
                 new MM_ElbowToPosition(elbow, ElbowConstants.kHomeWithAlgae, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.25),
+                // new WaitCommand(0.5),
                 new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kHomeWithAlgaePos, tolerance))));
+                    elevator, ElevatorConstants.kHomeFromAlgaeHighPos, tolerance))));
   }
 }

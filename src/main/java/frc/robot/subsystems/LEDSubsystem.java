@@ -1,14 +1,11 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,8 +22,8 @@ public class LEDSubsystem extends SubsystemBase {
 
   private final AddressableLED m_led = new AddressableLED(9);
   private AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LED_Length);
-  private AddressableLEDBufferView m_DriverData = m_ledBuffer.createView(0, 43);
-  private AddressableLEDBufferView m_OperatorData = m_ledBuffer.createView(44, LED_Length - 1);
+  // private AddressableLEDBufferView m_DriverData = m_ledBuffer.createView(0, 43);
+  // private AddressableLEDBufferView m_OperatorData = m_ledBuffer.createView(44, LED_Length - 1);
   // Our LED strip has a density of 30 LEDs per meter per AndyMark- TA TODO: Verify LED Density
   private static final Distance kLedSpacing = Meters.of(1 / 30.0);
 
@@ -40,6 +37,8 @@ public class LEDSubsystem extends SubsystemBase {
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
+
+    setOrangePattern();
   }
 
   @Override
@@ -61,8 +60,8 @@ public class LEDSubsystem extends SubsystemBase {
   public void setDriveActionStarted() {
     // m_led.start();
     LEDPattern color = LEDPattern.solid(Color.kRed);
-    color = color.blink((Seconds.of(slowBlinkingOnTime)), (Seconds.of(BlinkingOffTime)));
-    color.applyTo(m_DriverData);
+    // color = color.blink((Seconds.of(slowBlinkingOnTime)), (Seconds.of(BlinkingOffTime)));
+    color.applyTo(m_ledBuffer);
   }
 
   public Command setDriveCmdStarted() {
@@ -71,9 +70,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setDriveActionFinished() {
     // m_led.start();
-    LEDPattern color = LEDPattern.solid(Color.kGreen);
+    LEDPattern color = LEDPattern.solid(Color.kLime);
     // color = color.breathe(Seconds.of(fastBlinkingSpeed));
-    color.applyTo(m_DriverData);
+    color.applyTo(m_ledBuffer);
   }
 
   public Command setDriveCmdFinished() {
@@ -84,7 +83,7 @@ public class LEDSubsystem extends SubsystemBase {
     // m_led.start();
     LEDPattern color = LEDPattern.solid(Color.kRed);
     // color = color.breathe(Seconds.of(slowBlinkingSpeed));
-    color.applyTo(m_OperatorData);
+    color.applyTo(m_ledBuffer);
   }
 
   public Command setOperatorCmdStarted() {
@@ -93,9 +92,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setOperatorActionFinished() {
     // m_led.start();
-    LEDPattern color = LEDPattern.solid(Color.kGreen);
+    LEDPattern color = LEDPattern.solid(Color.kLime);
     // color = color.breathe(Seconds.of(fastBlinkingSpeed));
-    color.applyTo(m_OperatorData);
+    color.applyTo(m_ledBuffer);
   }
 
   public Command setOperatorCmdFinished() {
@@ -106,7 +105,7 @@ public class LEDSubsystem extends SubsystemBase {
     // m_led.start();
     LEDPattern color = LEDPattern.solid(Color.kWhite);
     // color = color.breathe(Seconds.of(fastBlinkingSpeed));
-    color.applyTo(m_OperatorData);
+    color.applyTo(m_ledBuffer);
   }
 
   public Command setOperatorShootCmd() {
@@ -118,9 +117,9 @@ public class LEDSubsystem extends SubsystemBase {
     orangeColor = new Color(255, 111, 0);
     LEDPattern orange = LEDPattern.solid(orangeColor);
     LEDPattern blue = LEDPattern.solid(Color.kRed);
-    LEDPattern bluePattern = blue.breathe(Seconds.of(1));
-    LEDPattern combined = orange.blend(bluePattern);
-    combined.applyTo(m_ledBuffer); // applys the "combined" color
+    // LEDPattern bluePattern = blue.breathe(Seconds.of(1));
+    // LEDPattern combined = orange.blend(bluePattern);
+    orange.applyTo(m_ledBuffer); // applys the "combined" color
   }
 
   public void setWhiteBlinking() {
@@ -132,7 +131,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setGreenBlinking() {
     // m_led.start();
-    LEDPattern green = LEDPattern.solid(Color.kGreen);
+    LEDPattern green = LEDPattern.solid(Color.kLime);
     // green = green.breathe(Seconds.of(fastBlinkingSpeed));
     green.applyTo(m_ledBuffer);
   }
@@ -140,20 +139,21 @@ public class LEDSubsystem extends SubsystemBase {
   public void setRedBlinking() {
     // m_led.start();
     LEDPattern red = LEDPattern.solid(Color.kRed);
-    LEDPattern blinkingRed = red.breathe(Seconds.of(fastBlinkingOnTime));
-    blinkingRed.applyTo(m_ledBuffer);
+    //    LEDPattern blinkingRed = red.breathe(Seconds.of(fastBlinkingOnTime));
+    red.applyTo(m_ledBuffer);
   }
 
-  public void setRainbow() {
-    // m_led.start();
-    // Create an LED pattern that will display a rainbow across
-    // all hues at maximum saturation and half brightness
-    LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-    // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
-    // of 1 meter per second.
-    LEDPattern m_scrollingRainbow =
-        m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
-    // Update the buffer with the rainbow animation
-    m_scrollingRainbow.applyTo(m_ledBuffer);
-  }
+  // public void setRainbow() {
+  //   // m_led.start();
+  //   // Create an LED pattern that will display a rainbow across
+  //   // all hues at maximum saturation and half brightness
+  //   LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  //   // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a
+  // speed
+  //   // of 1 meter per second.
+  //   LEDPattern m_scrollingRainbow =
+  //       m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+  //   // Update the buffer with the rainbow animation
+  //   m_scrollingRainbow.applyTo(m_ledBuffer);
+  // }
 }

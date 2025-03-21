@@ -122,31 +122,6 @@
               }
             ]
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootAlgae"
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Center2AlgaeStep6"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "HarvestCoral"
-                }
-              }
-            ]
-          }
         }
       ]
     }

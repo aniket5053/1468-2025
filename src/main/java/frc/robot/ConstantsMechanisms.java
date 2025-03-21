@@ -58,11 +58,11 @@ public final class ConstantsMechanisms {
     public static final double kPreLevel4Angle = 100.0;
     public static final double kLevel4AngleAuto = 89.5;
     public static final double kLevel4Angle = 88.5;
-    public static final double kAlgaeHighAngle = 85.0; // 88 was too straight up
+    public static final double kAlgaeHighAngle = 83.0; // 88 was too straight up
     public static final double kAlgaeLowAngle = 85.0; // 88 was too straight up
     public static final double kCoralStationAngle = 139.0; // 138 was too high, 140 was too low
     public static final double kBargeNetAngle = 100.0;
-    public static final double kHomeWithAlgae = 100.0;
+    public static final double kHomeWithAlgae = 105.0; // was 100
     public static final double kProcessorAngle = 135.0;
     public static final double kUnClimbAngle = 90.0;
     public static final double kPreClimbAngle1 = 135.0;
@@ -122,9 +122,10 @@ public final class ConstantsMechanisms {
     public static final double kLevel3Pos = 13.0; // higher since elbow is now 100, wass 90
     public static final double kPreLevel4Pos = 20.0; // now using in autonomous only
     public static final double kLevel4Pos = 41.0; // was 40
-    public static final double kHomeWithAlgaePos = 7.0; // was 0
     public static final double kAlgaeLowPos = 4.0; // was 0 too low
+    public static final double kHomeFromAlgaeLowPos = 7.0; // was 0
     public static final double kAlgaeHighPos = 18.0; //
+    public static final double kHomeFromAlgaeHighPos = 20.0; // was 0
     public static final double kPreBargeNetPos = 20;
     public static final double kBargeNetPos = 40.0; // was 44, algae shoots high so lower
     public static final double kProcessorPos = 0.0;

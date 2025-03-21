@@ -11,6 +11,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -76,7 +77,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final double ltCameraOffsetRoll = -5.5;
   private final double ltCameraOffsetPitch = -15.3;
-  private final double ltCameraOffesetYaw = +10.1; // was 8.5
+  private final double ltCameraOffesetYaw = +9.7; // was 8.5
 
   public final Transform3d robotToRightFrtCamera =
       new Transform3d(
@@ -157,6 +158,8 @@ public class VisionSubsystem extends SubsystemBase {
   private final AprilTagFieldLayout aprilTagFieldLayout =
       AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();
 
+  private AprilTagFieldLayout newLayout;
+
   private final PhotonCamera rightFrtCamera;
   private final PhotonCamera leftFrtCamera;
   private final PhotonPoseEstimator rightFrtCamPoseEstimator;
@@ -166,6 +169,9 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3, N1> curleftFrtCamStdDevs;
 
   public VisionSubsystem() {
+    // Creates new apriltag layout
+    installNewLayout();
+
     // Create PhotonCamera objects
     rightFrtCamera = new PhotonCamera("rightFrtCamera");
     leftFrtCamera = new PhotonCamera("leftFrtCamera");
@@ -577,6 +583,20 @@ public class VisionSubsystem extends SubsystemBase {
 
   public Matrix<N3, N1> getEstimationleftFrtCamStdDevs() {
     return curleftFrtCamStdDevs;
+  }
+
+  private void installNewLayout() {
+    try {
+      newLayout =
+          AprilTagFieldLayout.loadFromResource(
+              "src/main/deploy/apriltags/modifiedAprilTagLayout.json");
+      // new AprilTagFieldLayout(
+      // FileSystems.getDefault()
+      //     .getPath(
+      //         "/src", "main", "java", "robot", "generated", "modifiedAprilTagLayout.json"));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   // public void determineAprilTagToDriveTo() {

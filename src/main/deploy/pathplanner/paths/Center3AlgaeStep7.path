@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.14,
-        "y": 2.899
+        "x": 5.5,
+        "y": 6.505193661971831
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.609846310392954,
-        "y": 3.0700100716628342
+        "x": 5.969846310392954,
+        "y": 6.676203733634665
       },
       "isLocked": false,
       "linkedName": "CtrStp6EP"
@@ -48,7 +48,7 @@
   "folder": "3Coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 126.0
   },
   "useDefaultConstraints": true
 }

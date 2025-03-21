@@ -42,6 +42,6 @@ public class HandlerHarvestAlgae extends Command {
     // For Auto we can holdForever or Stop the motor 5 counts after the limit switch turns true
     // *** If holdForever is used in autonomous will need to "race" with another command to end
     if (holdForever) return false;
-    else return (counter >= 5);
+    else return (counter >= 10); // was 5 sensing algae to early
   }
 }
