@@ -142,13 +142,32 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "HarvestCoral"
+                  "name": "GetAlgaeLow"
                 }
               },
               {
                 "type": "path",
                 "data": {
                   "pathName": "3CoralRightStep6"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3CoralRightStep7"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HoldAlgaePreBargePos"
                 }
               }
             ]

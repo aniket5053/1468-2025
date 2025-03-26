@@ -22,8 +22,8 @@ public class ArmHomeFromAlgaeLow extends SequentialCommandGroup {
                 //                new WaitCommand(0.25),
                 new MM_ElbowToPosition(elbow, ElbowConstants.kHomeWithAlgae, tolerance)),
             Commands.sequence(
-                new WaitCommand(0.15), // Elev just has to go up a few inches
+                new WaitCommand(0.5), // Elev just has to go up a few inches - was .25, too fast
                 new MM_ElevatorToPosition(
-                    elevator, ElevatorConstants.kHomeFromAlgaeHighPos, tolerance))));
+                    elevator, ElevatorConstants.kHomeFromAlgaeLowPos, tolerance))));
   }
 }

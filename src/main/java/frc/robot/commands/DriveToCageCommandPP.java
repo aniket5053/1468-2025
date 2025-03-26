@@ -51,12 +51,11 @@ public class DriveToCageCommandPP extends Command {
     if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Red)
         && ((startX < 13.0) && (startY < 4.5))) {
-      //  Real Coordinates
-      endPtX = 9.9;
 
       if (endPtHoloRotation == 180.0) // going to climb
       {
-        endPtX = 9.35;
+        //    was  endPtX = 9.35;
+        endPtX = 9.9;
 
         if (m_drive.getCageLocation() == DriveConstants.kLeftSide) {
           endPtY = 0.815;
@@ -66,7 +65,8 @@ public class DriveToCageCommandPP extends Command {
           endPtY = 1.915;
         }
       } else {
-        endPtX = 9.9;
+        // endPtX = 9.9;
+        endPtX = 9.5;
         if (startY > 3.4) endPtY = 3.4;
         else endPtY = startY;
       }
@@ -76,11 +76,10 @@ public class DriveToCageCommandPP extends Command {
     } else if (DriverStation.getAlliance().isPresent()
         && (DriverStation.getAlliance().get() == Alliance.Blue)
         && ((startX > 4.5) && (startY > 4.0))) {
-      endPtX = 7.65;
 
       if (endPtHoloRotation == 0.0) // going to climb
       {
-        endPtX = 8.2;
+        endPtX = 8.0;
 
         if (m_drive.getCageLocation() == DriveConstants.kLeftSide) {
           endPtY = 7.238;
@@ -92,7 +91,8 @@ public class DriveToCageCommandPP extends Command {
 
       } else { // going to put algae on the barge - go straight forward, unless too far right, then
         // shift over
-        endPtX = 7.65;
+        //       endPtX = 7.65;
+        endPtX = 7.5;
         if (startY < 4.6) endPtY = 4.6;
         else endPtY = startY;
       }

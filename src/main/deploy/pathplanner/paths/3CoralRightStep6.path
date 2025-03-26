@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6344466094067265,
-        "y": 5.577553390593274
+        "x": 3.811223304703363,
+        "y": 5.400776695296637
       },
       "isLocked": false,
       "linkedName": "RtStp5EP"
     },
     {
       "anchor": {
-        "x": 1.5670055284375537,
-        "y": 7.334736618183438
+        "x": 3.852,
+        "y": 5.13
       },
       "prevControl": {
-        "x": 1.9205589190308279,
-        "y": 6.981183227590164
+        "x": 3.744536751918718,
+        "y": 5.35572472242052
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RtStp2EP"
+      "linkedName": "RtStp6EP"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "3Coral",

@@ -64,10 +64,10 @@ public final class ConstantsMechanisms {
     public static final double kBargeNetAngle = 100.0;
     public static final double kHomeWithAlgae = 105.0; // was 100
     public static final double kProcessorAngle = 135.0;
-    public static final double kUnClimbAngle = 90.0;
+    public static final double kUnClimbAngle = 83.0;
     public static final double kPreClimbAngle1 = 135.0;
     public static final double kPreClimbAngle2 = 145;
-    public static final double kClimbAngle = 173.0; // 165 too low
+    public static final double kClimbAngle = 176.0; // 165 too low
     public static final double kClimbDeltaAngle = 3.0;
     public static final double kClimbHigherAngle = kClimbAngle + kClimbDeltaAngle;
     public static final double kClimbLowerAngle = kClimbAngle - kClimbDeltaAngle;
@@ -191,6 +191,7 @@ public final class ConstantsMechanisms {
 
     public static final double kHandlerCoralInSpeed =
         0.10; // was .15, but too fast - coral went too far
+    public static final double kHandlerCoralOutSpeedAuto = 0.30; // 0.20 too fast
     public static final double kHandlerCoralOutSpeed = 0.15; // 0.20 too fast
     public static final double kHandlerAlgaeInSpeed = -.15;
     public static final double kHandlerAlgaeOutSpeed = 0.75;

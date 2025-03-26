@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -11,7 +14,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -65,19 +68,45 @@ public class VisionSubsystem extends SubsystemBase {
   // private final double adjustedLeftY = leftY + (scalingFactor * leftNormalY);
   // private final double adjustedLeftZ = leftZ + (scalingFactor * leftNormalZ);
 
-  private final double cameraOffsetX = 12.8439; // CAD looks correct
+  // Original Camera Mount used at hofstra //////////////////////////////////////////////////
+  // Original Camera Mount used at hofstra //////////////////////////////////////////////////
+  // Original Camera Mount used at hofstra //////////////////////////////////////////////////
+
+  // private final double cameraOffsetX = 12.8439; // CAD looks correct
+  // private final double cameraOffsetY =
+  //     9.2; // by measurement to camera focal plane - ruler measurement was 9.9425
+  // private final double cameraOffsetZ =
+  //     11.0344; // by measurement to camera focal plane - ruler measurement
+
+  // private final double rtCameraOffsetRoll = 6.1;
+  // private final double rtCameraOffsetPitch = -14.3;
+  // private final double rtCameraOffesetYaw = -7.45; // was 8.5 had about a 1.2 d error
+
+  // private final double ltCameraOffsetRoll = -5.5;
+  // private final double ltCameraOffsetPitch = -15.3;
+  // private final double ltCameraOffesetYaw = +9.7; // was 8.5
+
+  // End Original Camera Mount used at hofstra //////////////////////////////////////////////////
+  // End Original Camera Mount used at hofstra //////////////////////////////////////////////////
+  // End Original Camera Mount used at hofstra //////////////////////////////////////////////////
+
+  // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
+  // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
+  // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
+
+  private final double cameraOffsetX = 12.9; // CAD 13.0
   private final double cameraOffsetY =
-      9.2; // by measurement to camera focal plane - ruler measurement was 9.9425
+      10.45; // by measurement to camera focal plane - ruler measurement was 9.9425
   private final double cameraOffsetZ =
-      11.0344; // by measurement to camera focal plane - ruler measurement
+      12.160; // CAD Measurement - with Z offset from measurements on  dashboard
 
-  private final double rtCameraOffsetRoll = 6.1;
-  private final double rtCameraOffsetPitch = -14.3;
-  private final double rtCameraOffesetYaw = -7.45; // was 8.5 had about a 1.2 d error
+  private final double rtCameraOffsetRoll = 0.45; // was.65
+  private final double rtCameraOffsetPitch = -0.250;
+  private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
 
-  private final double ltCameraOffsetRoll = -5.5;
-  private final double ltCameraOffsetPitch = -15.3;
-  private final double ltCameraOffesetYaw = +9.7; // was 8.5
+  private final double ltCameraOffsetRoll = +0.0; // was 20
+  private final double ltCameraOffsetPitch = -.55; // was +.2
+  private final double ltCameraOffesetYaw = -22.665; // was 8.5
 
   public final Transform3d robotToRightFrtCamera =
       new Transform3d(
@@ -158,8 +187,6 @@ public class VisionSubsystem extends SubsystemBase {
   private final AprilTagFieldLayout aprilTagFieldLayout =
       AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();
 
-  private AprilTagFieldLayout newLayout;
-
   private final PhotonCamera rightFrtCamera;
   private final PhotonCamera leftFrtCamera;
   private final PhotonPoseEstimator rightFrtCamPoseEstimator;
@@ -168,17 +195,140 @@ public class VisionSubsystem extends SubsystemBase {
   private Matrix<N3, N1> currightFrtCamStdDevs;
   private Matrix<N3, N1> curleftFrtCamStdDevs;
 
+  private List<AprilTag> modifiedAprilTags;
+
   public VisionSubsystem() {
     // Creates new apriltag layout
-    installNewLayout();
+    List<AprilTag> modifiedAprilTags = new ArrayList<>();
+
+    AprilTag aprilTag6 =
+        new AprilTag(
+            6,
+            new Pose3d(
+                13.474446,
+                3.3063179999999996,
+                0.308102,
+                new Rotation3d(
+                    new Quaternion(-0.8660254037844387, -0.0, 0.0, 0.49999999999999994))));
+
+    AprilTag aprilTag7 =
+        new AprilTag(
+            7,
+            new Pose3d(
+                13.890498, 4.0259, 0.308102, new Rotation3d(new Quaternion(1.0, 0.0, 0.0, 0.0))));
+
+    AprilTag aprilTag8 =
+        new AprilTag(
+            8,
+            new Pose3d(
+                13.474446,
+                4.745482,
+                0.308102,
+                new Rotation3d(new Quaternion(0.8660254037844387, 0.0, 0.0, 0.49999999999999994))));
+
+    AprilTag aprilTag9 =
+        new AprilTag(
+            9,
+            new Pose3d(
+                12.643358,
+                4.745482,
+                0.308102,
+                new Rotation3d(new Quaternion(0.5000000000000001, 0.0, 0.0, 0.8660254037844386))));
+
+    AprilTag aprilTag10 =
+        new AprilTag(
+            10,
+            new Pose3d(
+                12.227305999999999,
+                4.0259,
+                0.308102,
+                new Rotation3d(new Quaternion(6.123233995736766e-17, 0.0, 0.0, 1.0))));
+
+    AprilTag aprilTag11 =
+        new AprilTag(
+            11,
+            new Pose3d(
+                12.643358,
+                3.3063179999999996,
+                0.308102,
+                new Rotation3d(
+                    new Quaternion(-0.4999999999999998, -0.0, 0.0, 0.8660254037844387))));
+
+    AprilTag aprilTag17 =
+        new AprilTag(
+            17,
+            new Pose3d(
+                4.073905999999999,
+                3.3063179999999996,
+                0.308102,
+                new Rotation3d(
+                    new Quaternion(-0.4999999999999998, -0.0, 0.0, 0.8660254037844387))));
+
+    AprilTag aprilTag18 =
+        new AprilTag(
+            18,
+            new Pose3d(
+                3.6576,
+                4.0259,
+                0.308102,
+                new Rotation3d(new Quaternion(6.123233995736766e-17, 0.0, 0.0, 1.0))));
+
+    AprilTag aprilTag19 =
+        new AprilTag(
+            19,
+            new Pose3d(
+                4.073905999999999,
+                4.745482,
+                0.308102,
+                new Rotation3d(new Quaternion(0.5000000000000001, 0.0, 0.0, 0.8660254037844386))));
+
+    AprilTag aprilTag20 =
+        new AprilTag(
+            20,
+            new Pose3d(
+                4.904739999999999,
+                4.745482,
+                0.308102,
+                new Rotation3d(new Quaternion(0.8660254037844387, 0.0, 0.0, 0.49999999999999994))));
+
+    AprilTag aprilTag21 =
+        new AprilTag(
+            21,
+            new Pose3d(
+                5.321046, 4.0259, 0.308102, new Rotation3d(new Quaternion(1.0, 0.0, 0.0, 0.0))));
+
+    AprilTag aprilTag22 =
+        new AprilTag(
+            22,
+            new Pose3d(
+                4.904739999999999,
+                3.3063179999999996,
+                0.308102,
+                new Rotation3d(
+                    new Quaternion(-0.8660254037844387, -0.0, 0.0, 0.49999999999999994))));
+
+    modifiedAprilTags.add(aprilTag6);
+    modifiedAprilTags.add(aprilTag7);
+    modifiedAprilTags.add(aprilTag8);
+    modifiedAprilTags.add(aprilTag9);
+    modifiedAprilTags.add(aprilTag10);
+    modifiedAprilTags.add(aprilTag11);
+
+    modifiedAprilTags.add(aprilTag17);
+    modifiedAprilTags.add(aprilTag18);
+    modifiedAprilTags.add(aprilTag19);
+    modifiedAprilTags.add(aprilTag20);
+    modifiedAprilTags.add(aprilTag21);
+    modifiedAprilTags.add(aprilTag22);
+    AprilTagFieldLayout newLayout = new AprilTagFieldLayout(modifiedAprilTags, 17.548, 8.052);
 
     // Create PhotonCamera objects
     rightFrtCamera = new PhotonCamera("rightFrtCamera");
     leftFrtCamera = new PhotonCamera("leftFrtCamera");
     rightFrtCamPoseEstimator =
-        new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToRightFrtCamera);
+        new PhotonPoseEstimator(newLayout, poseStrategy, robotToRightFrtCamera);
     leftFrtCamPoseEstimator =
-        new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, robotToLeftFrtCamera);
+        new PhotonPoseEstimator(newLayout, poseStrategy, robotToLeftFrtCamera);
 
     rightFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     leftFrtCamPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -230,8 +380,14 @@ public class VisionSubsystem extends SubsystemBase {
   // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.025, 0.025,
   // .1);
   // <1, 1, 2> too slow - was .5,.5,1.0  - still a little slow and yaw mostly robot gyro
-  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
-  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
+
+  // we used the below for most of Hoftstra - trying more aggressive numbers
+  // public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
+  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1,
+  // .25);
+  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.05, 0.05, .125);
+  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs =
+      VecBuilder.fill(0.05, 0.05, .125);
 
   @Override
   public void periodic() {
@@ -585,19 +741,15 @@ public class VisionSubsystem extends SubsystemBase {
     return curleftFrtCamStdDevs;
   }
 
-  private void installNewLayout() {
-    try {
-      newLayout =
-          AprilTagFieldLayout.loadFromResource(
-              "src/main/deploy/apriltags/modifiedAprilTagLayout.json");
-      // new AprilTagFieldLayout(
-      // FileSystems.getDefault()
-      //     .getPath(
-      //         "/src", "main", "java", "robot", "generated", "modifiedAprilTagLayout.json"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+  // private void installNewLayout() {
+  //   // try {
+  //   //   Path path = FileSystems.getDefault().getPath("modifiedAprilTagLayout.json");
+  //   //   newLayout = new AprilTagFieldLayout(path);
+  //   //   newLayout = new AprilTagFieldLayout(<public AprilTag(3,pOS)>,)
+  //   // } catch (IOException e) {
+  //   //   e.printStackTrace();
+  //   // }
+  // }
 
   // public void determineAprilTagToDriveTo() {
 

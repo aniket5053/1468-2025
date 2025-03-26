@@ -58,8 +58,10 @@ public class DriveToReefCommandPP extends Command {
 
       // creates intermediate point for on-the-fly path that has the bumper 14 inches from the end
       // point
-      double interPtX = (endPtX - (0.3556 * Math.cos(endPtHoloRotation * (Math.PI / 180))));
-      double interPtY = (endPtY - (0.3556 * Math.sin(endPtHoloRotation * (Math.PI / 180))));
+      // double interPtX = (endPtX - (0.3556 * Math.cos(endPtHoloRotation * (Math.PI / 180))));
+      // double interPtY = (endPtY - (0.3556 * Math.sin(endPtHoloRotation * (Math.PI / 180))));
+      double interPtX = (endPtX - (0.1778 * Math.cos(endPtHoloRotation * (Math.PI / 180))));
+      double interPtY = (endPtY - (0.1778 * Math.sin(endPtHoloRotation * (Math.PI / 180))));
       Pose2d interPt = new Pose2d(interPtX, interPtY, Rotation2d.fromDegrees(endPtHoloRotation));
 
       Pose2d endPt = new Pose2d(endPtX, endPtY, Rotation2d.fromDegrees(endPtHoloRotation));
@@ -523,8 +525,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 2.993;
           endPtHoloRotation = 120.0;
         } else {
-          endPtX = 13.709;
-          endPtY = 2.899;
+          endPtX = 13.697;
+          endPtY = 2.921;
           endPtHoloRotation = 120.0;
         }
         break;
@@ -539,7 +541,7 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 4.190;
           endPtHoloRotation = 180.0;
         } else {
-          endPtX = 14.360;
+          endPtX = 14.334;
           endPtY = 4.026;
           endPtHoloRotation = 180.0;
         }
@@ -555,8 +557,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 5.224;
           endPtHoloRotation = -120.0;
         } else {
-          endPtX = 13.709;
-          endPtY = 5.152;
+          endPtX = 13.697;
+          endPtY = 5.130;
           endPtHoloRotation = -120.0;
         }
         break;
@@ -571,8 +573,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 5.059;
           endPtHoloRotation = -60.0;
         } else {
-          endPtX = 12.408;
-          endPtY = 5.152;
+          endPtX = 12.421;
+          endPtY = 5.130;
           endPtHoloRotation = -60.0;
         }
         break;
@@ -587,7 +589,7 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 3.862;
           endPtHoloRotation = 0.0;
         } else {
-          endPtX = 11.758;
+          endPtX = 11.784;
           endPtY = 4.026;
           endPtHoloRotation = 0.0;
         }
@@ -603,8 +605,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 2.828;
           endPtHoloRotation = 60.0;
         } else {
-          endPtX = 12.409;
-          endPtY = 2.899;
+          endPtX = 12.421;
+          endPtY = 2.921;
           endPtHoloRotation = 60.0;
         }
         break;
@@ -621,8 +623,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 2.993;
           endPtHoloRotation = 120.0;
         } else {
-          endPtX = 5.140;
-          endPtY = 2.899;
+          endPtX = 5.127;
+          endPtY = 2.921;
           endPtHoloRotation = 120.0;
         }
         break;
@@ -637,7 +639,7 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 4.190;
           endPtHoloRotation = 180.0;
         } else {
-          endPtX = 5.790;
+          endPtX = 5.765;
           endPtY = 4.026;
           endPtHoloRotation = 180.0;
         }
@@ -653,8 +655,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 5.224;
           endPtHoloRotation = -120.0;
         } else {
-          endPtX = 5.140;
-          endPtY = 5.152;
+          endPtX = 5.127;
+          endPtY = 5.130;
           endPtHoloRotation = -120.0;
         }
         break;
@@ -669,8 +671,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 5.059;
           endPtHoloRotation = -60.0;
         } else {
-          endPtX = 3.839;
-          endPtY = 5.152;
+          endPtX = 3.852;
+          endPtY = 5.130;
           endPtHoloRotation = -60.0;
         }
         break;
@@ -685,7 +687,7 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 3.862;
           endPtHoloRotation = 0.0;
         } else {
-          endPtX = 3.189;
+          endPtX = 3.214;
           endPtY = 4.026;
           endPtHoloRotation = 0.0;
         }
@@ -701,8 +703,8 @@ public class DriveToReefCommandPP extends Command {
           endPtY = 2.828;
           endPtHoloRotation = 60.0;
         } else {
-          endPtX = 3.839;
-          endPtY = 2.899;
+          endPtX = 3.852;
+          endPtY = 2.921;
           endPtHoloRotation = 60.0;
         }
         break;

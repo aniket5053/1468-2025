@@ -91,11 +91,15 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Shoot",
         Commands.race( // Hold arm still until shot complete, then move arm down and end command
-                new HandlerShootCoralOut(s_Handler),
+                // timeout shoot in case it gets stuck
+                new HandlerShootCoralOutAuto(s_Handler).withTimeout(1.0),
                 new ArmLevel4(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
             // Auto Tolerance so command ends when arm at correct position
             // .andThen(new ArmHome(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
-            .andThen(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)));
+
+            .andThen(
+                new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto)
+                    .alongWith(new HandlerShootCoralOut(s_Handler))));
 
     NamedCommands.registerCommand(
         "HarvestCoral", // Only use as the DEADLINE with a drive Cmd (this cmd ends when coral
@@ -228,11 +232,38 @@ public class RobotContainer {
             () -> -driverRightJoystick.getX()));
 
     // Driver Buttons - Left Joystick  ---------------------------------------------
+    // Driver Buttons - Left Joystick  ---------------------------------------------
 
-    new JoystickButton(driverLeftJoystick, 1)
+    //    new JoystickButton(driverLeftJoystick, 1)
+    new JoystickButton(driverLeftJoystick, 3)
         .debounce(0.10)
         .onTrue(
             new DriveToCoralStCommandPP(drive, s_Vision, kLeftSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
+
+    // Coral Station Right Side
+    new JoystickButton(driverLeftJoystick, 4)
+        //    new JoystickButton(driverRightJoystick, 1)
+        .debounce(0.10)
+        .onTrue(
+            new DriveToCoralStCommandPP(drive, s_Vision, kRightSide)
+                .alongWith(s_LED.setDriveCmdStarted())
+                .andThen(s_LED.setDriveCmdFinished()));
+
+    // Configuration Buttons - comment out when done testing
+    new JoystickButton(driverLeftJoystick, 11)
+        .debounce(0.10)
+        .onTrue(DriveCommands.feedforwardCharacterization(drive));
+    new JoystickButton(driverLeftJoystick, 12)
+        .debounce(0.10)
+        .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
+    // Configuration Buttons - comment out when done testing
+
+    new JoystickButton(driverLeftJoystick, 6)
+        .debounce(0.10)
+        .onTrue(
+            new DriveToProcessorCommandPP(drive)
                 .alongWith(s_LED.setDriveCmdStarted())
                 .andThen(s_LED.setDriveCmdFinished()));
 
@@ -244,31 +275,8 @@ public class RobotContainer {
                 .alongWith(s_LED.setDriveCmdStarted())
                 .andThen(s_LED.setDriveCmdFinished()));
 
-    /* Configuration Buttons
-        new JoystickButton(driverLeftJoystick, 4)
-            .debounce(0.10)
-            .onTrue(DriveCommands.feedforwardCharacterization(drive));
-        new JoystickButton(driverLeftJoystick, 5)
-            .debounce(0.10)
-            .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
-    */
-
-    new JoystickButton(driverLeftJoystick, 6)
-        .debounce(0.10)
-        .onTrue(
-            new DriveToProcessorCommandPP(drive)
-                .alongWith(s_LED.setDriveCmdStarted())
-                .andThen(s_LED.setDriveCmdFinished()));
-
     // Driver Buttons - Right Joystick --------------------------------------------
-
-    // Coral Station Right Side
-    new JoystickButton(driverRightJoystick, 1)
-        .debounce(0.10)
-        .onTrue(
-            new DriveToCoralStCommandPP(drive, s_Vision, kRightSide)
-                .alongWith(s_LED.setDriveCmdStarted())
-                .andThen(s_LED.setDriveCmdFinished()));
+    // Driver Buttons - Right Joystick --------------------------------------------
 
     // Drive with left joystick, rotate to angle facing reef
     new JoystickButton(driverRightJoystick, 2)
@@ -280,7 +288,8 @@ public class RobotContainer {
                 () -> Rotation2d.fromDegrees(drive.getDesiredRotation())));
 
     // Center Lt, Rt Drive to Reef Commands
-    new JoystickButton(driverRightJoystick, 3)
+    //    new JoystickButton(driverRightJoystick, 3)
+    new JoystickButton(driverRightJoystick, 1)
         .debounce(0.10)
         .onTrue(
             new DriveToReefCommandPP(drive, s_Vision, kCenter)
@@ -300,7 +309,8 @@ public class RobotContainer {
                 .andThen(s_LED.setDriveCmdFinished()));
 
     // Switch to X pattern
-    new JoystickButton(driverRightJoystick, 6)
+    new JoystickButton(driverLeftJoystick, 1)
+        //    new JoystickButton(driverRightJoystick, 6)
         .debounce(0.10)
         .onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -355,17 +365,18 @@ public class RobotContainer {
                     new MM_ElevatorToPosition(
                         s_Elevator, ElevatorConstants.kStartPos, kToleranceHold)));
 
-    new JoystickButton(testOprJoystick, 4)
-        .debounce(0.10)
-        .onTrue(new MM_ElbowToPosition(s_Elbow, ElbowConstants.kProcessorAngle, kToleranceHold));
+    // new JoystickButton(testOprJoystick, 4)
+    //     .debounce(0.10)
+    //     .onTrue(new MM_ElbowToPosition(s_Elbow, ElbowConstants.kProcessorAngle, kToleranceHold));
 
-    new JoystickButton(testOprJoystick, 5)
-        .debounce(0.10)
-        .onTrue(new MM_ElevatorToPosition(s_Elevator, ElevatorConstants.kStartPos, kToleranceHold));
-    new JoystickButton(testOprJoystick, 6)
-        .debounce(0.10)
-        .onTrue(
-            new MM_ElevatorToPosition(s_Elevator, ElevatorConstants.kLevel4Pos, kToleranceHold));
+    // new JoystickButton(testOprJoystick, 5)
+    //     .debounce(0.10)
+    //     .onTrue(new MM_ElevatorToPosition(s_Elevator, ElevatorConstants.kStartPos,
+    // kToleranceHold));
+    // new JoystickButton(testOprJoystick, 6)
+    //     .debounce(0.10)
+    //     .onTrue(
+    //         new MM_ElevatorToPosition(s_Elevator, ElevatorConstants.kLevel4Pos, kToleranceHold));
 
     // new JoystickButton(testOprJoystick, 8)
     //     .debounce(0.10)
@@ -375,10 +386,11 @@ public class RobotContainer {
     //     .onTrue(new MM_WristToPosition(s_Wrist, WristConstants.kZeroOffset, kToleranceHold));
 
     // Test PreLevel4 button
-    new JoystickButton(testOprJoystick, 8)
-        .debounce(0.10)
-        .onTrue(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
-        .onFalse(new ArmLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+    // new JoystickButton(testOprJoystick, 8)
+    //     .debounce(0.10)
+    //     .onTrue(new HandlerShootCoralOutAuto(s_Handler));
+    // // .onTrue(new ArmPreLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold))
+    // .onFalse(new ArmLevel4Auto(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
 
     // Harvest In / eject up!
     new JoystickButton(testOprJoystick, 9)

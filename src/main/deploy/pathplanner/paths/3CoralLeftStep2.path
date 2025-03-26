@@ -8,20 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.697107373853763,
-        "y": 2.423491502812526
+        "x": 4.2588323692510714,
+        "y": 2.146875517630219
       },
       "isLocked": false,
       "linkedName": "LtStp1EndPt"
     },
     {
       "anchor": {
-        "x": 1.5356690140845055,
-        "y": 0.7114612676056311
+        "x": 3.078,
+        "y": 1.5804865954414675
       },
       "prevControl": {
-        "x": 1.829561640230742,
-        "y": 1.1159697647931048
+        "x": 3.5264072807981783,
+        "y": 1.801689919392948
+      },
+      "nextControl": {
+        "x": 2.853796359600911,
+        "y": 1.4698849334657274
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.4102138537207403,
+        "y": 0.7692158806108932
+      },
+      "prevControl": {
+        "x": 1.869733779504303,
+        "y": 0.9662981928762738
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 1.5,
       "rotationDegrees": 54.0
     }
   ],

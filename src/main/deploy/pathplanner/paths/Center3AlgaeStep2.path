@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.027,
-        "y": 3.862
+        "x": 6.0492238846040145,
+        "y": 3.9577575863603136
       },
       "isLocked": false,
       "linkedName": "CtrStp1EP"
@@ -20,8 +20,8 @@
         "y": 4.026
       },
       "prevControl": {
-        "x": 6.04,
-        "y": 4.026
+        "x": 6.059651453271021,
+        "y": 3.9786127236943285
       },
       "nextControl": null,
       "isLocked": false,

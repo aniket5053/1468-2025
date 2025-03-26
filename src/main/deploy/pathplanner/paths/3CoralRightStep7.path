@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.852,
+        "y": 5.13
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.854933098591549,
+        "y": 5.957672535211266
+      },
+      "isLocked": false,
+      "linkedName": "RtStp6EP"
+    },
+    {
+      "anchor": {
+        "x": 6.0,
+        "y": 6.547711267605633
+      },
+      "prevControl": {
+        "x": 4.5969190140845075,
+        "y": 6.165052816901408
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -178.8065105760179
+  },
+  "reversed": false,
+  "folder": "3Coral",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -59.99999999999999
+  },
+  "useDefaultConstraints": true
+}

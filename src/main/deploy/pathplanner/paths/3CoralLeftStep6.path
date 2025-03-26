@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.604977778440511,
-        "y": 2.5066061951567304
+        "x": 3.8220337175818626,
+        "y": 2.641036920488822
       },
       "isLocked": false,
       "linkedName": "LtStp5EndPt"
     },
     {
       "anchor": {
-        "x": 1.5356690140845055,
-        "y": 0.7114612676056311
+        "x": 3.852,
+        "y": 2.921
       },
       "prevControl": {
-        "x": 1.9186912356439945,
-        "y": 1.0328550724489007
+        "x": 3.759989209597516,
+        "y": 2.6885478233065774
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LtStp2EndPt"
+      "linkedName": "LtStp6EP"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 54.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "3Coral",
