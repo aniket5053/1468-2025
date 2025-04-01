@@ -20,7 +20,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private static final int LED_Length = 88;
 
-  private final AddressableLED m_led = new AddressableLED(9);
+  private final AddressableLED m_led = new AddressableLED(8);
   private AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LED_Length);
   // private AddressableLEDBufferView m_DriverData = m_ledBuffer.createView(0, 43);
   // private AddressableLEDBufferView m_OperatorData = m_ledBuffer.createView(44, LED_Length - 1);

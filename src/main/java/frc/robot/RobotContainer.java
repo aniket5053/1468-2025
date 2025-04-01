@@ -252,12 +252,12 @@ public class RobotContainer {
                 .andThen(s_LED.setDriveCmdFinished()));
 
     // Configuration Buttons - comment out when done testing
-    new JoystickButton(driverLeftJoystick, 11)
-        .debounce(0.10)
-        .onTrue(DriveCommands.feedforwardCharacterization(drive));
-    new JoystickButton(driverLeftJoystick, 12)
-        .debounce(0.10)
-        .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
+    // new JoystickButton(driverLeftJoystick, 11)
+    //     .debounce(0.10)
+    //     .onTrue(DriveCommands.feedforwardCharacterization(drive));
+    // new JoystickButton(driverLeftJoystick, 12)
+    //     .debounce(0.10)
+    //     .onTrue(DriveCommands.wheelRadiusCharacterization(drive));
     // Configuration Buttons - comment out when done testing
 
     new JoystickButton(driverLeftJoystick, 6)

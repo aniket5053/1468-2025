@@ -267,6 +267,13 @@ public class Robot extends LoggedRobot {
     double deltaLtRtX = ltCamX - rtCamX;
     double deltaLtRtY = ltCamY - rtCamY;
     double deltaLtRtYaw = ltCamYaw - rtCamYaw;
+
+    double deltaLtRobotX = ltCamX - robotX;
+    double deltaLtRobotY = ltCamY - robotY;
+
+    double deltaRtRobotX = rtCamX - robotX;
+    double deltaRtRobotY = rtCamY - robotY;
+
     double deltaRobotX = robotX - (ltCamX + rtCamX) / 2;
     double deltaRobotY = robotY - (ltCamY + rtCamY) / 2;
     double deltaRobotYaw = robotYaw - aveYaw;
@@ -276,6 +283,21 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("BOTdX", deltaRobotX);
     SmartDashboard.putNumber("BOTdY", deltaRobotY);
     SmartDashboard.putNumber("BOTdYaw", deltaRobotYaw);
+
+    double LtRtDist = Math.sqrt(deltaLtRtX * deltaLtRtX + deltaLtRtY * deltaLtRtY);
+    double LtRobotDist = Math.sqrt(deltaLtRobotX * deltaLtRobotX + deltaLtRobotY * deltaLtRobotY);
+    double RtRobotDist = Math.sqrt(deltaRtRobotX * deltaRtRobotX + deltaRtRobotY * deltaRtRobotY);
+
+    boolean LtRtClose, LtRobotClose, RtRobotClose;
+    if (LtRtDist < 0.02) LtRtClose = true;
+    else LtRtClose = false;
+    if (LtRobotDist < 0.02) LtRobotClose = true;
+    else LtRobotClose = false;
+    if (RtRobotDist < 0.02) RtRobotClose = true;
+    else RtRobotClose = false;
+    SmartDashboard.putBoolean("LtRtClose", LtRtClose);
+    SmartDashboard.putBoolean("LtRobotClose", LtRobotClose);
+    SmartDashboard.putBoolean("RtRobotClose", RtRobotClose);
 
     SmartDashboard.putNumber("Mod0 in Rotations", robotContainer.drive.getModuleAngle(0) / 360.0);
     SmartDashboard.putNumber("Mod1 in Rotations", robotContainer.drive.getModuleAngle(1) / 360.0);

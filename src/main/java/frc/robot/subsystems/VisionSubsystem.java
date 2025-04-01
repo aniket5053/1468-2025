@@ -100,12 +100,12 @@ public class VisionSubsystem extends SubsystemBase {
   private final double cameraOffsetZ =
       12.160; // CAD Measurement - with Z offset from measurements on  dashboard
 
-  private final double rtCameraOffsetRoll = 0.45; // was.65
-  private final double rtCameraOffsetPitch = -0.250;
+  private final double rtCameraOffsetRoll = 0.0; // was.65
+  private final double rtCameraOffsetPitch = -0.10;
   private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
 
-  private final double ltCameraOffsetRoll = +0.0; // was 20
-  private final double ltCameraOffsetPitch = -.55; // was +.2
+  private final double ltCameraOffsetRoll = -0.40; // was 20
+  private final double ltCameraOffsetPitch = -.25; // was +.2
   private final double ltCameraOffesetYaw = -22.665; // was 8.5
 
   public final Transform3d robotToRightFrtCamera =
@@ -381,13 +381,20 @@ public class VisionSubsystem extends SubsystemBase {
   // .1);
   // <1, 1, 2> too slow - was .5,.5,1.0  - still a little slow and yaw mostly robot gyro
 
-  // we used the below for most of Hoftstra - trying more aggressive numbers
-  // public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
-  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1,
-  // .25);
-  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.05, 0.05, .125);
-  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs =
-      VecBuilder.fill(0.05, 0.05, .125);
+  // we used the below for most of Hoftstra - the more aggressive numbers below worked worse
+  public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
+  public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.1, 0.1, .25);
+
+  // Still seems slow - doubling rate for translation - faster rate is more incorrect - autonomous
+  // works worse.
+  // public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.05, 0.05,
+  // .125);
+  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs = VecBuilder.fill(0.05, 0.05,
+  // .125);
+  // public static final Matrix<N3, N1> kMultiTagleftFrtCamStdDevs = VecBuilder.fill(0.025, 0.025,
+  // .1);
+  // public static final Matrix<N3, N1> kMultiTagrightFrtCamStdDevs =
+  //     VecBuilder.fill(0.025, 0.025, .1);
 
   @Override
   public void periodic() {

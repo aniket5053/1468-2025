@@ -127,7 +127,7 @@ public class TunerConstants {
   // private static final Distance kWheelRadius = Inches.of(1.948);
   // private static final Distance kWheelRadius = Inches.of(1.936); // too small
   private static final Distance kWheelRadius =
-      Inches.of(1.914); // used 10ft auto to calc - was 1.945
+      Inches.of(1.929); // used 10ft auto to calc - was 1.945 tried 1.914 too small, 1.945 too big
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;

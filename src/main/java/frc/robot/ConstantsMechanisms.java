@@ -59,14 +59,14 @@ public final class ConstantsMechanisms {
     public static final double kLevel4AngleAuto = 89.5;
     public static final double kLevel4Angle = 88.5;
     public static final double kAlgaeHighAngle = 83.0; // 88 was too straight up
-    public static final double kAlgaeLowAngle = 85.0; // 88 was too straight up
+    public static final double kAlgaeLowAngle = 83.0; // 88 was too straight up
     public static final double kCoralStationAngle = 139.0; // 138 was too high, 140 was too low
     public static final double kBargeNetAngle = 100.0;
     public static final double kHomeWithAlgae = 105.0; // was 100
     public static final double kProcessorAngle = 135.0;
     public static final double kUnClimbAngle = 83.0;
-    public static final double kPreClimbAngle1 = 135.0;
-    public static final double kPreClimbAngle2 = 145;
+    public static final double kPreClimbAngle1 = 130.0; // was135
+    public static final double kPreClimbAngle2 = 145; // 150 no better
     public static final double kClimbAngle = 176.0; // 165 too low
     public static final double kClimbDeltaAngle = 3.0;
     public static final double kClimbHigherAngle = kClimbAngle + kClimbDeltaAngle;
@@ -129,7 +129,7 @@ public final class ConstantsMechanisms {
     public static final double kPreBargeNetPos = 20;
     public static final double kBargeNetPos = 40.0; // was 44, algae shoots high so lower
     public static final double kProcessorPos = 0.0;
-    public static final double kClimbPos = 4.5;
+    public static final double kClimbPos = 4.75; // was 4.5
     public static final double kUnClimbPos = 6.0;
 
     public static double kReverseSoftLimit = 0;
@@ -165,8 +165,8 @@ public final class ConstantsMechanisms {
     public static final double kLevel2Angle = -50.0; // -45 was too high
     public static final double kLevel3Angle = -42.0;
     public static final double kLevel4Angle = -73.0; //
-    public static final double kAlgaeLowAngle = -45.0; // elevator at 0, so angle cant be higher
-    public static final double kAlgaeHighAngle = -45.0; // was -35 - too low
+    public static final double kAlgaeLowAngle = -40.0; // was -45. too steep
+    public static final double kAlgaeHighAngle = -40.0; // was -45 - too steep
     public static final double kCoralStationAngle = -90.0; // working this angle -65 was too
     public static final double kBargeNetAngle = +89.0;
     public static final double kProcessorAngle = -35.0; // was -30
@@ -194,7 +194,7 @@ public final class ConstantsMechanisms {
     public static final double kHandlerCoralOutSpeedAuto = 0.30; // 0.20 too fast
     public static final double kHandlerCoralOutSpeed = 0.15; // 0.20 too fast
     public static final double kHandlerAlgaeInSpeed = -.15;
-    public static final double kHandlerAlgaeOutSpeed = 0.75;
+    public static final double kHandlerAlgaeOutSpeed = 0.90;
     public static final double kDesiredRotationsPerSecond = 100.0;
 
     public static final boolean kHoldForever = true;
