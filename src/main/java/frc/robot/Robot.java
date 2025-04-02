@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -141,6 +142,13 @@ public class Robot extends LoggedRobot {
 
     //   if (robotContainer.s_Vision.getLeftFrtCamNumOfTgts()
     //       < robotContainer.s_Vision.getRightFrtCamNumOfTgts()) {
+
+    // Adds time-stamped gyro readings
+    double timestamp = Timer.getFPGATimestamp();
+    robotContainer.s_Vision.rightFrtCamPoseEstimator.addHeadingData(
+        timestamp, robotContainer.drive.rawGyroRotation);
+    robotContainer.s_Vision.leftFrtCamPoseEstimator.addHeadingData(
+        timestamp, robotContainer.drive.rawGyroRotation);
 
     // Correct pose estimate with vision measurements
     var rightFrtCamPoseEst = robotContainer.s_Vision.getEstimatedGlobalPoseUsingrightFrtCamTgts();

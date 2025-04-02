@@ -189,13 +189,11 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final PhotonCamera rightFrtCamera;
   private final PhotonCamera leftFrtCamera;
-  private final PhotonPoseEstimator rightFrtCamPoseEstimator;
-  private final PhotonPoseEstimator leftFrtCamPoseEstimator;
+  public final PhotonPoseEstimator rightFrtCamPoseEstimator;
+  public final PhotonPoseEstimator leftFrtCamPoseEstimator;
 
   private Matrix<N3, N1> currightFrtCamStdDevs;
   private Matrix<N3, N1> curleftFrtCamStdDevs;
-
-  private List<AprilTag> modifiedAprilTags;
 
   public VisionSubsystem() {
     // Creates new apriltag layout
