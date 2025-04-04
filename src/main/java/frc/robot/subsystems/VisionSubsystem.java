@@ -94,19 +94,19 @@ public class VisionSubsystem extends SubsystemBase {
   // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
   // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
 
-  private final double cameraOffsetX = 12.9; // CAD 13.0
+  private final double cameraOffsetX = 13.6; // CAD 13.0
   private final double cameraOffsetY =
-      10.45; // by measurement to camera focal plane - ruler measurement was 9.9425
+      10.5; // by measurement to camera focal plane - ruler measurement was 9.9425
   private final double cameraOffsetZ =
-      12.160; // CAD Measurement - with Z offset from measurements on  dashboard
+      12.125; // CAD Measurement - with Z offset from measurements on  dashboard
 
   private final double rtCameraOffsetRoll = 0.0; // was.65
-  private final double rtCameraOffsetPitch = -0.10;
-  private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
+  private final double rtCameraOffsetPitch = 0.50;
+  private final double rtCameraOffesetYaw = +22.8;
 
-  private final double ltCameraOffsetRoll = -0.40; // was 20
-  private final double ltCameraOffsetPitch = -.25; // was +.2
-  private final double ltCameraOffesetYaw = -22.665; // was 8.5
+  private final double ltCameraOffsetRoll = -0.440; // was 20
+  private final double ltCameraOffsetPitch = -.5; // was +.2
+  private final double ltCameraOffesetYaw = -22.8;
 
   public final Transform3d robotToRightFrtCamera =
       new Transform3d(
@@ -189,13 +189,11 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final PhotonCamera rightFrtCamera;
   private final PhotonCamera leftFrtCamera;
-  private final PhotonPoseEstimator rightFrtCamPoseEstimator;
-  private final PhotonPoseEstimator leftFrtCamPoseEstimator;
+  public final PhotonPoseEstimator rightFrtCamPoseEstimator;
+  public final PhotonPoseEstimator leftFrtCamPoseEstimator;
 
   private Matrix<N3, N1> currightFrtCamStdDevs;
   private Matrix<N3, N1> curleftFrtCamStdDevs;
-
-  private List<AprilTag> modifiedAprilTags;
 
   public VisionSubsystem() {
     // Creates new apriltag layout
@@ -371,7 +369,7 @@ public class VisionSubsystem extends SubsystemBase {
   double rtCamTgt1Area = 0.0;
 
   // TA TODO: RIght now have only 1 Single Tag StdDev, s/b OK, need to calibrate multitag StdDevs!!!
-  public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+  public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(.1, .1, 4);
   // public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
   // These 2 constantly bounced off each other, try sligjtly lower values to average them
