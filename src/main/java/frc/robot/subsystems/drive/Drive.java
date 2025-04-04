@@ -131,6 +131,9 @@ public class Drive extends SubsystemBase {
           stateSTDS,
           initialVisionSTDS);
 
+  // private final SwerveSetpointGenerator setpointGenerator;
+  // private SwerveSetpoint previousSetpoint;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -195,6 +198,12 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    // setpointGenerator = new SwerveSetpointGenerator(PP_CONFIG, Units.rotationsToRadians(10.0));
+    // previousSetpoint =
+    //     new SwerveSetpoint(
+    //         getChassisSpeeds(), getModuleStates(),
+    // DriveFeedforwards.zeros(PP_CONFIG.numModules));
   }
 
   @Override
@@ -270,17 +279,25 @@ public class Drive extends SubsystemBase {
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
+    // previousSetpoint =
+    //     setpointGenerator.generateSetpoint(
+    //         previousSetpoint, // The previous setpoint
+    //         speeds, // The desired target speeds
+    //         0.02 // The loop time of the robot code, in seconds
+    //         );
+
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
+      // modules[i].runSetpoint(previousSetpoint.moduleStates()[i]);
       modules[i].runSetpoint(setpointStates[i]);
     }
 
     // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    // Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */

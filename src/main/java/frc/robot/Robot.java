@@ -297,11 +297,11 @@ public class Robot extends LoggedRobot {
     double RtRobotDist = Math.sqrt(deltaRtRobotX * deltaRtRobotX + deltaRtRobotY * deltaRtRobotY);
 
     boolean LtRtClose, LtRobotClose, RtRobotClose;
-    if (LtRtDist < 0.02) LtRtClose = true;
+    if (LtRtDist < 0.0254) LtRtClose = true;
     else LtRtClose = false;
-    if (LtRobotDist < 0.02) LtRobotClose = true;
+    if (LtRobotDist < 0.0254) LtRobotClose = true;
     else LtRobotClose = false;
-    if (RtRobotDist < 0.02) RtRobotClose = true;
+    if (RtRobotDist < 0.0254) RtRobotClose = true;
     else RtRobotClose = false;
     SmartDashboard.putBoolean("LtRtClose", LtRtClose);
     SmartDashboard.putBoolean("LtRobotClose", LtRobotClose);
