@@ -94,19 +94,34 @@ public class VisionSubsystem extends SubsystemBase {
   // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
   // Ofsets for Camera mounts with Yaw only ////////////////////////////////////////////////////
 
-  private final double cameraOffsetX = 12.9; // CAD 13.0
+  // values used at Tech Valley - these werent working well
+  // private final double cameraOffsetX = 12.9; // CAD 13.0
+  // private final double cameraOffsetY =
+  //     10.45; // by measurement to camera focal plane - ruler measurement was 9.9425
+  // private final double cameraOffsetZ =
+  //     12.160; // CAD Measurement - with Z offset from measurements on  dashboard
+
+  // private final double rtCameraOffsetRoll = 0.0; // was.65
+  // private final double rtCameraOffsetPitch = -0.10;
+  // private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
+
+  // private final double ltCameraOffsetRoll = -0.40; // was 20
+  // private final double ltCameraOffsetPitch = -.25; // was +.2
+  // private final double ltCameraOffesetYaw = -22.665; // was 8.5
+
+  private final double cameraOffsetX = 13.6; // CAD 13.0
   private final double cameraOffsetY =
-      10.45; // by measurement to camera focal plane - ruler measurement was 9.9425
+      10.5; // by measurement to camera focal plane - ruler measurement was 9.9425
   private final double cameraOffsetZ =
-      12.160; // CAD Measurement - with Z offset from measurements on  dashboard
+      12.125; // CAD Measurement - with Z offset from measurements on  dashboard
 
-  private final double rtCameraOffsetRoll = 0.0; // was.65
-  private final double rtCameraOffsetPitch = -0.10;
-  private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
+  private final double rtCameraOffsetRoll = 0.0; // was
+  private final double rtCameraOffsetPitch = 0.50;
+  private final double rtCameraOffesetYaw = +22.8; // was
 
-  private final double ltCameraOffsetRoll = -0.40; // was 20
-  private final double ltCameraOffsetPitch = -.25; // was +.2
-  private final double ltCameraOffesetYaw = -22.665; // was 8.5
+  private final double ltCameraOffsetRoll = -0.440; // was
+  private final double ltCameraOffsetPitch = -.5; // was
+  private final double ltCameraOffesetYaw = -22.8; // was
 
   public final Transform3d robotToRightFrtCamera =
       new Transform3d(
