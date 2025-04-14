@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,12 +102,12 @@ public class VisionSubsystem extends SubsystemBase {
       12.125; // CAD Measurement - with Z offset from measurements on  dashboard
 
   private final double rtCameraOffsetRoll = 0.0; // was.65
-  private final double rtCameraOffsetPitch = -0.10;
-  private final double rtCameraOffesetYaw = +23.285; // was 8.5 had about a 1.2 d error
+  private final double rtCameraOffsetPitch = 0.50;
+  private final double rtCameraOffesetYaw = +22.8; // was 8.5 had about a 1.2 d error
 
-  private final double ltCameraOffsetRoll = -0.40; // was 20
-  private final double ltCameraOffsetPitch = -.25; // was +.2
-  private final double ltCameraOffesetYaw = -22.665; // was 8.5
+  private final double ltCameraOffsetRoll = -0.440; // was 20
+  private final double ltCameraOffsetPitch = -.5; // was +.2
+  private final double ltCameraOffesetYaw = -22.8; // was 8.5
 
   public final Transform3d robotToRightFrtCamera =
       new Transform3d(
@@ -369,7 +370,9 @@ public class VisionSubsystem extends SubsystemBase {
   double rtCamTgt1Area = 0.0;
 
   // TA TODO: RIght now have only 1 Single Tag StdDev, s/b OK, need to calibrate multitag StdDevs!!!
-  public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(.1, .1, 4);
+  public static final Matrix<N3, N1> kTeleOpSingleTagStdDevs = VecBuilder.fill(.1, .1, 4);
+  public static final Matrix<N3, N1> kAutoSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+  public Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
   // public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
   // These 2 constantly bounced off each other, try sligjtly lower values to average them
@@ -630,6 +633,13 @@ public class VisionSubsystem extends SubsystemBase {
   private void updateEstimationRightFrtCamStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
 
+    // Seperate Auto Single Target Updates from TeleOp
+    if (DriverStation.isAutonomous()) {
+      kSingleTagStdDevs = kAutoSingleTagStdDevs;
+    } else {
+      kSingleTagStdDevs = kTeleOpSingleTagStdDevs;
+    }
+
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
       currightFrtCamStdDevs = kSingleTagStdDevs;
@@ -664,7 +674,9 @@ public class VisionSubsystem extends SubsystemBase {
         // Decrease std devs if multiple targets are visible
         if (numTags > 1) estStdDevs = kMultiTagrightFrtCamStdDevs;
         // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
+        // if (numTags == 1 && avgDist > 4) - TA need to lessen distance since single tag StdDev so
+        // low
+        if (numTags == 1 && avgDist > 3)
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         currightFrtCamStdDevs = estStdDevs;
@@ -700,6 +712,14 @@ public class VisionSubsystem extends SubsystemBase {
    */
   private void updateEstimationLeftFrtCamStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+
+    // Seperate Auto Single Target Updates from TeleOp
+    if (DriverStation.isAutonomous()) {
+      kSingleTagStdDevs = kAutoSingleTagStdDevs;
+    } else {
+      kSingleTagStdDevs = kTeleOpSingleTagStdDevs;
+    }
+
     if (estimatedPose.isEmpty()) {
       // No pose input. Default to single-tag std devs
       curleftFrtCamStdDevs = kSingleTagStdDevs;
@@ -734,7 +754,9 @@ public class VisionSubsystem extends SubsystemBase {
         // Decrease std devs if multiple targets are visible
         if (numTags > 1) estStdDevs = kMultiTagleftFrtCamStdDevs;
         // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
+        // if (numTags == 1 && avgDist > 4) - TA need to lessen distance since single tag StdDev so
+        // low
+        if (numTags == 1 && avgDist > 3)
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         curleftFrtCamStdDevs = estStdDevs;

@@ -67,6 +67,6 @@ public class MM_ElbowToPosition extends Command {
         < m_toleranceDegrees / kEncoderRotation2Degrees) {
       counter++;
     }
-    return ((counter >= 5));
+    return ((counter >= 2));
   }
 }

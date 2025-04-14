@@ -126,8 +126,9 @@ public class TunerConstants {
   private static final double kSteerGearRatio = 18.75;
   // private static final Distance kWheelRadius = Inches.of(1.948);
   // private static final Distance kWheelRadius = Inches.of(1.936); // too small
+  // new thread now - 4/11/25
   private static final Distance kWheelRadius =
-      Inches.of(1.929); // used 10ft auto to calc - was 1.945 tried 1.914 too small, 1.945 too big
+      Inches.of(1.945); // used 10ft auto to calc - was 1.945 tried 1.914 too small, 1.945 too big
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;

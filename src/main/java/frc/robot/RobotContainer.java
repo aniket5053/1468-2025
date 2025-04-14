@@ -61,6 +61,8 @@ public class RobotContainer {
   final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
   final WristSubsystem s_Wrist = new WristSubsystem();
   final HandlerSubsystem s_Handler = new HandlerSubsystem();
+  //   final ClimberSubsystem s_Climber = new ClimberSubsystem();
+  final ClimberSubsystem s_Climber;
   final VisionSubsystem s_Vision = new VisionSubsystem();
   final LEDSubsystem s_LED = new LEDSubsystem();
 
@@ -70,6 +72,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    s_Climber = new ClimberSubsystem();
 
     // Register named commands for PathPlanner Auto Routines
     // The drive commands are in the PathPlanner AutoRoutines only
@@ -125,7 +129,7 @@ public class RobotContainer {
             .andThen(
                 Commands.race( // Hold Algae while Moving Home
                     new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                    new ArmHomeFromAlgaeHigh(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
+                    new ArmHomeFromAlgaeHigh(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto * 4.0))));
 
     NamedCommands.registerCommand(
         "GetAlgaeLow",
@@ -135,7 +139,7 @@ public class RobotContainer {
             .andThen(
                 Commands.race( // Hold Algae while Moving Home
                     new HandlerHarvestAlgae(s_Handler, kHoldForever),
-                    new ArmHomeFromAlgaeLow(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto))));
+                    new ArmHomeFromAlgaeLow(s_Elevator, s_Elbow, s_Wrist, kToleranceAuto * 4.0))));
 
     NamedCommands.registerCommand(
         "HoldAlgaePreBargePos", // Only use in race with a drive cmd - THIS COMMAND NEVER FINISHES
@@ -189,14 +193,14 @@ public class RobotContainer {
         break;
     }
 
-    // Show what command your subsystem is running on the SmartDashboard
-    SmartDashboard.putData(drive);
-    SmartDashboard.putData(s_Elbow);
-    SmartDashboard.putData(s_Elevator);
-    SmartDashboard.putData(s_Wrist);
-    SmartDashboard.putData(s_Handler);
-    SmartDashboard.putData(s_Vision);
-    SmartDashboard.putData(s_LED);
+    // Show what command your subsystem is running on the SmartDashboard - doesnt work
+    // SmartDashboard.putData(drive);
+    // SmartDashboard.putData(s_Elbow);
+    // SmartDashboard.putData(s_Elevator);
+    // SmartDashboard.putData(s_Wrist);
+    // SmartDashboard.putData(s_Handler);
+    // SmartDashboard.putData(s_Vision);
+    // SmartDashboard.putData(s_LED);
 
     // Put Cage Selection binary buttons on SmartDashboard
     SmartDashboard.putBoolean("LeftCage", false);
@@ -365,6 +369,15 @@ public class RobotContainer {
                     new MM_ElevatorToPosition(
                         s_Elevator, ElevatorConstants.kStartPos, kToleranceHold)));
 
+    new JoystickButton(testOprJoystick, 4)
+        .debounce(0.10)
+        .onTrue(
+            new InstantCommand(
+                () -> s_Climber.setClimberVoltageVelos(ClimberConstants.kClimberInSpeed)));
+    new JoystickButton(testOprJoystick, 4)
+        .debounce(0.10)
+        .onFalse(new InstantCommand(() -> s_Climber.stop()));
+
     // new JoystickButton(testOprJoystick, 4)
     //     .debounce(0.10)
     //     .onTrue(new MM_ElbowToPosition(s_Elbow, ElbowConstants.kProcessorAngle, kToleranceHold));
@@ -459,19 +472,29 @@ public class RobotContainer {
     // Climb and Unclimb buttons
     new JoystickButton(operatorJoystick, 7)
         .debounce(0.10)
-        .onTrue(new ArmUnClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+        .onTrue(
+            new ArmUnClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
+                .alongWith(
+                    new InstantCommand(
+                        () -> s_Climber.setClimberVoltageVelos(ClimberConstants.kClimberInSpeed))));
+
+    // new JoystickButton(operatorJoystick, 8)
+    //     .debounce(0.10)
+    //     .onTrue(
+    //         new ArmPreClimb1(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
+    //             .alongWith(new InstantCommand(() -> s_Climber.stop())));
 
     new JoystickButton(operatorJoystick, 8)
         .debounce(0.10)
-        .onTrue(new ArmPreClimb1(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+        .onTrue(
+            new ArmPreClimb2(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
+                .alongWith(new InstantCommand(() -> s_Climber.stop())));
 
     new JoystickButton(operatorJoystick, 9)
         .debounce(0.10)
-        .onTrue(new ArmPreClimb2(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
-
-    new JoystickButton(operatorJoystick, 10)
-        .debounce(0.10)
-        .onTrue(new ArmClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold));
+        .onTrue(
+            new ArmClimb(s_Elevator, s_Elbow, s_Wrist, kToleranceHold)
+                .alongWith(new InstantCommand(() -> s_Climber.stop())));
 
     // Arm Up to Net - holding algae
     new JoystickButton(operatorJoystick, 11)

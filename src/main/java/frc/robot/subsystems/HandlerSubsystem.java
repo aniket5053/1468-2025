@@ -53,11 +53,12 @@ public class HandlerSubsystem extends SubsystemBase {
     // Peak output of 8 volts
     configs.Voltage.withPeakForwardVoltage(Volts.of(8)).withPeakReverseVoltage(Volts.of(-8));
 
-    /* Torque-based velocity does not require a velocity feed forward, as torque will accelerate the rotor up to the desired velocity by itself */
-    configs.Slot1.kS = 2.5; // To account for friction, add 2.5 A of static feedforward
-    configs.Slot1.kP = 5; // An error of 1 rotation per second results in 5 A output
-    configs.Slot1.kI = 0; // No output for integrated error
-    configs.Slot1.kD = 0; // No output for error derivative
+    // /* Torque-based velocity does not require a velocity feed forward, as torque will accelerate
+    // the rotor up to the desired velocity by itself */
+    // configs.Slot1.kS = 2.5; // To account for friction, add 2.5 A of static feedforward
+    // configs.Slot1.kP = 5; // An error of 1 rotation per second results in 5 A output
+    // configs.Slot1.kI = 0; // No output for integrated error
+    // configs.Slot1.kD = 0; // No output for error derivative
     // Peak output of 40 A
     configs.TorqueCurrent.withPeakForwardTorqueCurrent(Amps.of(40))
         .withPeakReverseTorqueCurrent(Amps.of(-40));
@@ -100,41 +101,13 @@ public class HandlerSubsystem extends SubsystemBase {
   }
 
   /* Set power to the HANDLER motor */
-  public void setHandlerSpeeds(double ltSpeed, double rtSpeed) {
-    m_leftHandlerMotor.set(ltSpeed);
-    m_rightHandlerMotor.set(-rtSpeed); // right should follow without command
-  }
-
-  /* Set power to the HANDLER motor */
   public void setHandlerVoltageVelos(double ltSpeed, double rtSpeed) {
 
     m_leftHandlerMotor.setControl(
         m_velocityVoltage.withVelocity(ltSpeed * kDesiredRotationsPerSecond));
     m_rightHandlerMotor.setControl(
-        m_velocityVoltage.withVelocity(-rtSpeed * kDesiredRotationsPerSecond)); // right should
-    // follow without command
+        m_velocityVoltage.withVelocity(-rtSpeed * kDesiredRotationsPerSecond));
   }
-
-  /* Set power to the HANDLER motor - THIS DOES NOT WORK WITH OUR MOTOR VERSION!!!*/
-  public void setHandlerTorqueVelos(double ltSpeed, double rtSpeed) {
-    m_leftHandlerMotor.setControl(
-        //        m_velocityTorque.withVelocity(-ltSpeed).withFeedForward(-1)); // 1 didnt work
-        m_velocityTorque.withVelocity(ltSpeed * kDesiredRotationsPerSecond));
-
-    //
-    // m_rightHandlerMotor.setControl(m_velocityTorque.withVelocity(rtSpeed).withFeedForward(-1));
-  }
-
-  /* Set power to the HANDLER motor */
-  // public void shootNote() {
-  //   m_leftHandlerMotor.set(SHOOT_SPEED);
-  //  }
-
-  /* Set power to the HANDLER motor */
-  // public void ejectNote() {
-  //   m_leftHandlerMotor.set(-HANDLER_EJECT_SPEED);
-  //   m_rightHandlerMotor.set(HANDLER_EJECT_SPEED);
-  // }
 
   public void stop() {
     m_leftHandlerMotor.set(0);

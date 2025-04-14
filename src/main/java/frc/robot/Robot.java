@@ -312,13 +312,13 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("Mod2 in Rotations", robotContainer.drive.getModuleAngle(2) / 360.0);
     SmartDashboard.putNumber("Mod3 in Rotations", robotContainer.drive.getModuleAngle(3) / 360.0);
 
-    boolean isAligned = ShootLimitSwitch.get();
+    //  boolean isAligned = ShootLimitSwitch.get();
     // if (!isAligned) robotContainer.s_LED.setWhiteBlinking();
-    SmartDashboard.putBoolean("Aligned", isAligned); // TA TODO: Need to get a working Align LS
+    //  SmartDashboard.putBoolean("Aligned", isAligned); // TA TODO: Need to get a working Align LS
 
-    boolean cageCaptured = CageLimitSwitch.get();
+    // boolean cageCaptured = CageLimitSwitch.get();
     //   if (!cageCaptured) robotContainer.s_LED.setWhiteBlinking();
-    SmartDashboard.putBoolean("CageCaptured", cageCaptured);
+    // SmartDashboard.putBoolean("CageCaptured", cageCaptured);
   }
 
   /** This function is called once when the robot is disabled. */

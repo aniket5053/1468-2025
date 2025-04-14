@@ -52,10 +52,10 @@ public class DriveToCageCommandPP extends Command {
         && (DriverStation.getAlliance().get() == Alliance.Red)
         && ((startX < 13.0) && (startY < 4.5))) {
 
-      if (endPtHoloRotation == 180.0) // going to climb
+      if (endPtHoloRotation == 180.0) // going to climb - was 180
       {
         //    was  endPtX = 9.35;
-        endPtX = 9.9;
+        endPtX = 9.42;
 
         if (m_drive.getCageLocation() == DriveConstants.kLeftSide) {
           endPtY = 0.815;
@@ -66,7 +66,7 @@ public class DriveToCageCommandPP extends Command {
         }
       } else {
         // endPtX = 9.9;
-        endPtX = 9.5;
+        endPtX = 9.9;
         if (startY > 3.4) endPtY = 3.4;
         else endPtY = startY;
       }
@@ -79,7 +79,7 @@ public class DriveToCageCommandPP extends Command {
 
       if (endPtHoloRotation == 0.0) // going to climb
       {
-        endPtX = 8.0;
+        endPtX = 8.13;
 
         if (m_drive.getCageLocation() == DriveConstants.kLeftSide) {
           endPtY = 7.238;

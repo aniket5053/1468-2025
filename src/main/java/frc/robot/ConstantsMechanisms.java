@@ -64,18 +64,18 @@ public final class ConstantsMechanisms {
     public static final double kBargeNetAngle = 100.0;
     public static final double kHomeWithAlgae = 105.0; // was 100
     public static final double kProcessorAngle = 135.0;
-    public static final double kUnClimbAngle = 83.0;
-    public static final double kPreClimbAngle1 = 130.0; // was135
-    public static final double kPreClimbAngle2 = 145; // 150 no better
+    public static final double kUnClimbAngle = 90.0;
+    public static final double kPreClimbAngle1 = 130.0; // was135 - not used right now
+    public static final double kPreClimbAngle2 = 150; // was 145
     public static final double kClimbAngle = 176.0; // 165 too low
-    public static final double kClimbDeltaAngle = 3.0;
+    public static final double kClimbDeltaAngle = 2.0;
     public static final double kClimbHigherAngle = kClimbAngle + kClimbDeltaAngle;
     public static final double kClimbLowerAngle = kClimbAngle - kClimbDeltaAngle;
 
     public static final double kLowerSoftLimit = 82;
     public static final double kUpperSoftLimit = 180;
 
-    public static final double kSmallMoveDegrees = 3;
+    public static final double kSmallMoveDegrees = 2;
     // If MM routine sees these values as input, it will make a small move (not got to that angle)
     public static final double kUpSmallDegrees = 1000.0;
     public static final double kDownSmallDegrees = -1000.0;
@@ -123,9 +123,11 @@ public final class ConstantsMechanisms {
     public static final double kPreLevel4Pos = 20.0; // now using in autonomous only
     public static final double kLevel4Pos = 41.0; // was 40
     public static final double kAlgaeLowPos = 4.0; // was 0 too low
-    public static final double kHomeFromAlgaeLowPos = 7.0; // was 0
+    public static final double kHomeFromAlgaeLowPos =
+        kAlgaeLowPos; // was 7 - trying to make ctr auto faster
     public static final double kAlgaeHighPos = 18.0; //
-    public static final double kHomeFromAlgaeHighPos = 20.0; // was 0
+    public static final double kHomeFromAlgaeHighPos =
+        kAlgaeHighPos; // was 20 - trying to make ctr auto faster
     public static final double kPreBargeNetPos = 20;
     public static final double kBargeNetPos = 40.0; // was 44, algae shoots high so lower
     public static final double kProcessorPos = 0.0;
@@ -159,7 +161,8 @@ public final class ConstantsMechanisms {
     // TA TODO: Need to optimize this number
     public static final double kStartAngle = -91.0;
     public static final double kHomeAngle = -90.0;
-    public static final double kHomeWithAlgaeAngle = -45.0;
+    public static final double kHomeWithAlgaeAngle =
+        -40.0; // was  -45 trying to make ctr auto faster
     // Arm is too tall for Level 1 & 2, so have to tilt at a high angle to score there
     public static final double kLevel1Angle = -45.0; // have to shoot out over climber
     public static final double kLevel2Angle = -50.0; // -45 was too high
@@ -171,7 +174,7 @@ public final class ConstantsMechanisms {
     public static final double kBargeNetAngle = +89.0;
     public static final double kProcessorAngle = -35.0; // was -30
     public static final double kClimbAngle = +0.0;
-    public static final double kUnClimbAngle = +0.0;
+    public static final double kUnClimbAngle = -90.0;
 
     public static double kReverseSoftLimit = -90.0;
     public static double kForwardSoftLimit = 90.0;
@@ -185,7 +188,7 @@ public final class ConstantsMechanisms {
     public static final int kHandlerLeftMotorCanId = 26;
     public static final int kHandlerRightMotorCanId = 27;
 
-    public static final int kHandlerLimitSwitchId = 2;
+    // public static final int kHandlerLimitSwitchId = 2;
 
     public static final boolean kHandlerInvert = false;
 
@@ -195,6 +198,22 @@ public final class ConstantsMechanisms {
     public static final double kHandlerCoralOutSpeed = 0.15; // 0.20 too fast
     public static final double kHandlerAlgaeInSpeed = -.15;
     public static final double kHandlerAlgaeOutSpeed = 0.90;
+    public static final double kDesiredRotationsPerSecond = 100.0;
+
+    public static final boolean kHoldForever = true;
+  }
+
+  //////////////////////////    Climber     /////////////////////////////////////////
+
+  public static final class ClimberConstants {
+    public static final int kClimberMotorCanId = 28;
+
+    // public static final int kClimberLimitSwitchId = 4;
+
+    public static final boolean kClimberInvert = false;
+
+    public static final double kClimberInSpeed = 0.5; // .15 too slow
+    public static final double kClimberOutSpeed = -0.5;
     public static final double kDesiredRotationsPerSecond = 100.0;
 
     public static final boolean kHoldForever = true;
